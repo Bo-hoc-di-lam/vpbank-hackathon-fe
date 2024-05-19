@@ -1,21 +1,50 @@
-import { Vortex } from "../components/ui/vortex"
+import { motion } from "framer-motion"
+import React, { useMemo } from "react"
+import { AuroraBackground } from "../components/ui/aurora-background"
+import { useNavigate } from "react-router-dom"
+import { PlaceholdersAndVanishInput } from "../components/ui/placeholders-and-vanish-input"
 
 export default function Home() {
+    const placeholders = useMemo(
+        () => [
+            "How to create a Netflix-like website",
+            "How to build a chat application",
+            "How to create a social media platform",
+            "How to build a banking application",
+        ],
+        []
+    )
+
+    const navigate = useNavigate()
     return (
-        <div className="w-full mx-auto rounded-md  h-full overflow-hidden">
-            <Vortex
-                backgroundColor="black"
-                className="flex items-center flex-col justify-center px-2 md:px-10 py-4 w-full h-full"
+        <AuroraBackground>
+            <motion.div
+                initial={{ opacity: 0.0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{
+                    delay: 0.3,
+                    duration: 0.8,
+                    ease: "easeInOut",
+                }}
+                className="relative flex flex-col gap-4 items-center justify-center px-4"
             >
-                <h2 className="text-white text-2xl md:text-6xl font-bold text-center">
-                    The hell is this?
-                </h2>
-                <p className="text-white text-sm md:text-2xl max-w-xl mt-6 text-center">
-                    This is chemical burn. It&apos;ll hurt more than you&apos;ve
-                    ever been burned and you&apos;ll have a scar.
-                </p>
-                <div className="flex flex-col sm:flex-row items-center gap-4 mt-6"></div>
-            </Vortex>
-        </div>
+                <div className="text-3xl md:text-7xl font-bold dark:text-white text-center">
+                    VPBank Hackathon
+                </div>
+                {/* <div className="font-extralight text-base md:text-4xl dark:text-neutral-200 py-4">
+                    And this, is chemical burn.
+                </div> */}
+                <PlaceholdersAndVanishInput
+                    placeholders={placeholders}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        console.log(e.target.value)
+                    }
+                    onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
+                        e.preventDefault()
+                        navigate("/diagram")
+                    }}
+                />
+            </motion.div>
+        </AuroraBackground>
     )
 }

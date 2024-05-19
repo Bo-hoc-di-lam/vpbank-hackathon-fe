@@ -3,7 +3,6 @@ import ReactFlow, {
     addEdge,
     Background,
     Controls,
-    MiniMap,
     OnConnect,
     useEdgesState,
     useNodesState,
@@ -11,6 +10,7 @@ import ReactFlow, {
 
 import { initialNodes, nodeTypes } from "../../nodes"
 import { initialEdges, edgeTypes } from "../../edges"
+import { MainLayout } from "../../components/layouts"
 
 const DiagramPage = () => {
     const [nodes, , onNodesChange] = useNodesState(initialNodes)
@@ -20,7 +20,7 @@ const DiagramPage = () => {
         [setEdges]
     )
     return (
-        <>
+        <MainLayout>
             <ReactFlow
                 nodes={nodes}
                 nodeTypes={nodeTypes}
@@ -32,10 +32,9 @@ const DiagramPage = () => {
                 fitView
             >
                 <Background />
-                <MiniMap />
                 <Controls />
             </ReactFlow>
-        </>
+        </MainLayout>
     )
 }
 
