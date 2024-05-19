@@ -13,7 +13,7 @@ interface MainLayoutProps {
 
 export function MainLayout({
     title = "VPBank Hackathon",
-    sidebar,
+    sidebar = true,
     children,
 }: MainLayoutProps) {
     const [chatOpened, { toggle: toggleChat }] = useDisclosure(true)
@@ -41,7 +41,7 @@ export function MainLayout({
                         <Link to="/">This is LOGO</Link>
                     </Group>
                 </AppShell.Header>
-                <AppShell.Navbar p="md">
+                <AppShell.Navbar p="md" className="z-20">
                     {sidebar && <Sidebar />}
                 </AppShell.Navbar>
                 <AppShell.Main className="h-full">{children}</AppShell.Main>
