@@ -16,6 +16,8 @@ export function MainLayout({
     sidebar = true,
     children,
 }: MainLayoutProps) {
+    const [sidebarOpened, { open: openSidebar, close: closeSidebar }] =
+        useDisclosure(false)
     const [chatOpened, { toggle: toggleChat }] = useDisclosure(true)
 
     useDocumentTitle(title)
@@ -25,8 +27,9 @@ export function MainLayout({
             <AppShell
                 header={{ height: 60 }}
                 navbar={{
-                    width: 60,
+                    width: 300,
                     breakpoint: "sm",
+                    collapsed: { desktop: !sidebarOpened, mobile: true },
                 }}
                 aside={{
                     width: 500,
@@ -41,10 +44,15 @@ export function MainLayout({
                         <Link to="/">This is LOGO</Link>
                     </Group>
                 </AppShell.Header>
-                <AppShell.Navbar p="md" className="z-20">
-                    {sidebar && <Sidebar />}
-                </AppShell.Navbar>
-                <AppShell.Main className="h-full">{children}</AppShell.Main>
+                {sidebar && (
+                    <Sidebar
+                        openSidebar={openSidebar}
+                        closeSidebar={closeSidebar}
+                    />
+                )}
+                <AppShell.Main ml={60} className="h-full">
+                    {children}
+                </AppShell.Main>
                 <AppShell.Aside p="md">
                     <div className="absolute -left-8 rounded-l-xl overflow-hidden">
                         <ActionIcon

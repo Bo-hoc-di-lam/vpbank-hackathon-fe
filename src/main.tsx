@@ -10,7 +10,6 @@ import "reactflow/dist/style.css"
 
 import Home from "./pages"
 import DiagramPage from "./pages/diagram"
-import SidebarDrawerProvider from "./context/sidebar-drawer-context"
 
 const queryClient = new QueryClient()
 
@@ -29,9 +28,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
         <QueryClientProvider client={queryClient}>
             <MantineProvider>
-                <SidebarDrawerProvider>
-                    <RouterProvider router={router} />
-                </SidebarDrawerProvider>
+                <RouterProvider router={router} />
             </MantineProvider>
         </QueryClientProvider>
     </React.StrictMode>
