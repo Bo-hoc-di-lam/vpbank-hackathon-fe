@@ -1,12 +1,7 @@
-import {
-    ActionIcon,
-    AppShell,
-    CloseButton,
-    Stack,
-    Tooltip,
-} from "@mantine/core"
-import { Icon12Hours, IconAccessPoint } from "@tabler/icons-react"
+import { ActionIcon, AppShell, Stack, Title, Tooltip } from "@mantine/core"
+import { IconEdit } from "@tabler/icons-react"
 import { useMemo, useState } from "react"
+import { ManualEdit } from "./sidebar-items"
 
 interface SidebarProps {
     openSidebar: () => void
@@ -23,14 +18,9 @@ const Sidebar = ({ openSidebar, closeSidebar }: SidebarProps) => {
     const sidebarItems = useMemo<SidebarItem[]>(() => {
         return [
             {
-                icon: <Icon12Hours size={24} />,
-                label: "Time",
-                chilren: <div>Time</div>,
-            },
-            {
-                icon: <IconAccessPoint size={24} />,
-                label: "Network",
-                chilren: <div>Network</div>,
+                icon: <IconEdit size={24} />,
+                label: "Manual edit",
+                chilren: <ManualEdit />,
             },
         ]
     }, [])
@@ -57,10 +47,16 @@ const Sidebar = ({ openSidebar, closeSidebar }: SidebarProps) => {
                             label={item.label}
                             position="right"
                             withArrow
+                            disabled={activeItem === item}
                         >
                             <ActionIcon
                                 aria-label={item.label}
                                 onClick={() => handleActiveItem(item)}
+                                variant={
+                                    activeItem === item
+                                        ? "filled"
+                                        : "transparent"
+                                }
                             >
                                 {item.icon}
                             </ActionIcon>
@@ -69,7 +65,12 @@ const Sidebar = ({ openSidebar, closeSidebar }: SidebarProps) => {
                 </Stack>
             </div>
             <AppShell.Navbar p="md" zIndex="10" ml={60}>
-                {activeItem?.chilren}
+                <AppShell.Section>
+                    <Title order={4}>{activeItem?.label}</Title>
+                </AppShell.Section>
+                <AppShell.Section my={"md"} grow>
+                    {activeItem?.chilren}
+                </AppShell.Section>
             </AppShell.Navbar>
         </>
     )

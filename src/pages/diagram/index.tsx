@@ -30,6 +30,10 @@ const DiagramPage = () => {
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
                 fitView
+                defaultEdgeOptions={{
+                    animated: true,
+                    type: "smoothstep",
+                }}
             >
                 <Background />
                 <Controls />

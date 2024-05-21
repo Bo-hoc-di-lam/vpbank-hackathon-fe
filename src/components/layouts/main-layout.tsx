@@ -12,7 +12,7 @@ interface MainLayoutProps {
 }
 
 export function MainLayout({
-    title = "VPBank Hackathon",
+    title = "VPBank Hackathon | Team 100 | BHDL",
     sidebar = true,
     children,
 }: MainLayoutProps) {

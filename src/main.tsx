@@ -10,6 +10,7 @@ import "reactflow/dist/style.css"
 
 import Home from "./pages"
 import DiagramPage from "./pages/diagram"
+import { ReactFlowProvider } from "reactflow"
 
 const queryClient = new QueryClient()
 
@@ -28,7 +29,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
         <QueryClientProvider client={queryClient}>
             <MantineProvider>
-                <RouterProvider router={router} />
+                <ReactFlowProvider>
+                    <RouterProvider router={router} />
+                </ReactFlowProvider>
             </MantineProvider>
         </QueryClientProvider>
     </React.StrictMode>

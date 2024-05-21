@@ -31,9 +31,10 @@ export default function Home() {
                 <div className="text-3xl md:text-7xl font-bold dark:text-white text-center">
                     VPBank Hackathon
                 </div>
-                {/* <div className="font-extralight text-base md:text-4xl dark:text-neutral-200 py-4">
-                    And this, is chemical burn.
-                </div> */}
+                <div className="font-extralight text-base md:text-4xl dark:text-neutral-200 py-4">
+                    Team 100 - BHDL
+                </div>
+
                 <PlaceholdersAndVanishInput
                     placeholders={placeholders}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
