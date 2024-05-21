@@ -1,6 +1,6 @@
 import { useMemo } from "react"
 import { useReactFlow } from "reactflow"
-import { cn } from "../../../../utils/cn"
+import { Button } from "@mantine/core"
 
 let id = 0
 
@@ -9,26 +9,24 @@ const ManualEdit = () => {
     const editTools = useMemo(
         () => [
             {
-                displayElement: (
-                    <div
-                        className={cn(
-                            `react-flow__node react-flow__node-input nopan selectable w-full`
-                        )}
-                    >
-                        Add node
-                    </div>
-                ),
+                label: "Add node",
                 action: () => {
                     reactflow.addNodes({
                         id: `node_${id++}`,
                         type: "default",
                         position: {
-                            // random positive negative values
-                            x: Math.random() * 600 - 300,
-                            y: Math.random() * 600 - 300,
+                            x: 0,
+                            y: -200,
                         },
                         data: { label: `Node ${id}` },
                     })
+                },
+            },
+            {
+                label: "Clear canvas",
+                action: () => {
+                    reactflow.setEdges([])
+                    reactflow.setNodes([])
                 },
             },
         ],
@@ -36,11 +34,16 @@ const ManualEdit = () => {
     )
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
             {editTools.map((tool, index) => (
-                <div key={index} onClick={tool.action}>
-                    {tool.displayElement}
-                </div>
+                <Button
+                    fullWidth
+                    variant="light"
+                    key={index}
+                    onClick={tool.action}
+                >
+                    {tool.label}
+                </Button>
             ))}
         </div>
     )
