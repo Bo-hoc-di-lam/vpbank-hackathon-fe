@@ -1,4 +1,4 @@
-import { ActionIcon, AppShell, Group } from "@mantine/core"
+import { ActionIcon, AppShell, Group, Image, Title } from "@mantine/core"
 import { useDisclosure, useDocumentTitle } from "@mantine/hooks"
 import { IconMessageCircle, IconX } from "@tabler/icons-react"
 import { Sidebar } from "./sidebar"
@@ -41,7 +41,12 @@ export function MainLayout({
             >
                 <AppShell.Header>
                     <Group h="100%" px="md">
-                        <Link to="/">This is LOGO</Link>
+                        <Link to="/" className="flex gap-3 items-center">
+                            <Image src="/logo.png" alt="BHDL Logo" h={40} />
+                            <Title order={5}>
+                                VPBank Hackathon | Team 100 | BHDL
+                            </Title>
+                        </Link>
                     </Group>
                 </AppShell.Header>
                 {sidebar && (
