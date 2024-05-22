@@ -17,7 +17,7 @@ import { MainLayout } from "../../components/layouts"
 import { useRemoveLogo } from "../../hooks"
 import { ActionIcon, Tooltip } from "@mantine/core"
 import { IconLayout } from "@tabler/icons-react"
-import { useToggle } from "@mantine/hooks"
+import { useHotkeys, useToggle } from "@mantine/hooks"
 
 const directionRecords: Record<string, string> = {
     TB: "Top to Bottom",
@@ -47,6 +47,15 @@ const getLayoutedElements = (nodes: any, edges: any, options: any) => {
 }
 const DiagramPage = () => {
     useRemoveLogo()
+
+    useHotkeys([
+        [
+            "A+A",
+            () =>
+                (window.location.href =
+                    "https://www.youtube.com/watch?v=dQw4w9WgXcQ"),
+        ],
+    ])
     const [direction, toggleDirection] = useToggle(["TB", "BT", "RL", "LR"])
 
     const { fitView } = useReactFlow()
@@ -82,7 +91,7 @@ const DiagramPage = () => {
                 fitView
                 defaultEdgeOptions={{
                     animated: true,
-                    type: "smoothstep",
+                    type: "straight",
                 }}
             >
                 <Panel position="top-left">
