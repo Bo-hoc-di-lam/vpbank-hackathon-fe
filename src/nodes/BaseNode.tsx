@@ -88,6 +88,12 @@ const BaseNode = ({
         }
     }, [isSaved, labelEdit, nodeId, getNode, getNodes, setNodes])
 
+    useEffect(() => {
+        if (!selected) {
+            handleEditCancel()
+        }
+    }, [selected])
+
     return (
         <>
             <NodeToolbar position={Position.Top} offset={10} align="end">
