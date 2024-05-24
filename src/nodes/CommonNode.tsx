@@ -1,16 +1,14 @@
 import { NodeProps } from "reactflow"
-import BaseNode from "./BaseNode"
+import BaseNode, { BaseNodeData } from "./BaseNode"
 
-export type CommonNodeData = {
-    label?: string
-}
+export interface CommonNodeData extends BaseNodeData {}
 
 export const CommonNode = ({ data, selected }: NodeProps<CommonNodeData>) => {
     return (
-        <BaseNode selected={selected} className="w-[150px] rounded-md">
-            {data.label && (
-                <div className="text-center text-xs">{data.label}</div>
-            )}
-        </BaseNode>
+        <BaseNode
+            label={data.label}
+            selected={selected}
+            className="w-[150px] rounded-md"
+        />
     )
 }
