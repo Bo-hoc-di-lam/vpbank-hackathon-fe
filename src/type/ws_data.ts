@@ -1,27 +1,29 @@
 import { Link, SubGraph, Vertex } from "./diagram"
 
 export enum WSEvent {
+    Error = 'ERROR',
     Prompt = 'PROMPT',
     PromptEdit = 'PROMPT_EDIT',
-    JoinRoom = 'JOIN_ROOM',
-    Error = 'ERROR',
-    RoomInfo = 'ROOM_INFO',
     AddNode = 'ADD_NODE',
-    DelNode = 'DEL_NODE',
-    ChangeNode = 'CHANGE_NODE',
     AddLink = 'ADD_LINK',
-    DelLink = 'DEL_LINK',
-    ChangeLink = 'CHANGE_LINK',
     AddSubGraph = 'ADD_SUB_GRAPH',
-    DelSubGraph = 'DEL_SUB_GRAPH',
+    ChangeNode = 'CHANGE_NODE',
+    ChangeLink = 'CHANGE_LINK',
     ChangeSubGraph = 'CHANGE_SUB_GRAPH',
+    DelNode = 'DEL_NODE',
+    DelLink = 'DEL_LINK',
+    DelSubGraph = 'DEL_SUB_GRAPH',
     SetNodePosition = 'SET_NODE_POSITION',
+    JoinRoom = 'JOIN_ROOM',
+    RoomInfo = 'ROOM_INFO',
     SetComment = 'SET_COMMENT',
 }
 
-export interface Message {
+export type MessageData = string | Prompt | Vertex | Link | SubGraph
+
+export interface Message<T extends MessageData> {
     event: WSEvent
-    data: any
+    data: T
 }
 
 export interface Prompt {
