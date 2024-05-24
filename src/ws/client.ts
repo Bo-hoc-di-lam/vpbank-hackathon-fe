@@ -104,11 +104,21 @@ export class WSClient {
         this.ws.send(JSON.stringify(data))
     }
 
-    public GenerateIcon(iconType: System) {
+    public GenerateCode(system: System) {
+        const data: Message<SystemTypeDTO> = {
+            event: WSEvent.GenerateCode,
+            data: {
+                type: system
+            }
+        }
+        this.ws.send(JSON.stringify(data))
+    }
+
+    public GenerateIcon(system: System) {
         const data: Message<SystemTypeDTO> = {
             event: WSEvent.GenerateIcon,
             data: {
-                type: iconType
+                type: system
             }
         }
         this.ws.send(JSON.stringify(data))
