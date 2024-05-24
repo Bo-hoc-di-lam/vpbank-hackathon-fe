@@ -3,6 +3,9 @@ import React, { useMemo } from "react"
 import { AuroraBackground } from "../components/ui/aurora-background"
 import { useNavigate } from "react-router-dom"
 import { PlaceholdersAndVanishInput } from "../components/ui/placeholders-and-vanish-input"
+import { WSClient} from '../api/client'
+
+const ws = new WSClient()
 
 export default function Home() {
     const placeholders = useMemo(
