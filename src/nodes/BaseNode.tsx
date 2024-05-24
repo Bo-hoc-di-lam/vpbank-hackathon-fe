@@ -1,4 +1,7 @@
-import { useCheckNodeSelected, useSelectedNodeStore } from "@/store/node-store"
+import {
+    useCheckNodeSelected,
+    useSelectedNodeStore,
+} from "@/store/selected-node-store"
 import { cn } from "@/utils/cn"
 import { ActionIcon } from "@mantine/core"
 import { IconMinus, IconPlus } from "@tabler/icons-react"
