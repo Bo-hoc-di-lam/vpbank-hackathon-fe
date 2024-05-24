@@ -1,5 +1,4 @@
 import type { Node, NodeTypes } from "reactflow"
-import { PositionLoggerNode } from "./PositionLoggerNode"
 import { StadiumShapedNode } from "./StadiumShapedNode"
 import { CircleNode } from "./CircleNode"
 import { RhombusNode } from "./RhombusNode"
@@ -36,7 +35,6 @@ export const initialNodes = [
 
 export const nodeTypes = {
     common: CommonNode,
-    "position-logger": PositionLoggerNode,
     "stadium-shaped": StadiumShapedNode,
     circle: CircleNode,
     rhombus: RhombusNode,
