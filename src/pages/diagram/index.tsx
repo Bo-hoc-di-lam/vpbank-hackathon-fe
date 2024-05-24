@@ -18,6 +18,8 @@ import { useRemoveLogo } from "../../hooks"
 import { ActionIcon, Tooltip } from "@mantine/core"
 import { IconLayout } from "@tabler/icons-react"
 import { useHotkeys, useToggle } from "@mantine/hooks"
+import { WSClient } from "@/ws/client";
+import { WSEvent } from "@/type/ws_data";
 
 const directionRecords: Record<string, string> = {
     TB: "Top to Bottom",
@@ -27,6 +29,7 @@ const directionRecords: Record<string, string> = {
 }
 
 const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}))
+const ws = new WSClient();
 
 const getLayoutedElements = (nodes: any, edges: any, options: any) => {
     g.setGraph({ rankdir: options.direction })
@@ -59,8 +62,8 @@ const DiagramPage = () => {
     const [direction, toggleDirection] = useToggle(["TB", "BT", "RL", "LR"])
 
     const { fitView } = useReactFlow()
-    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
-    const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
+    const [nodes, setNodes, onNodesChange] = useNodesState([])
+    const [edges, setEdges, onEdgesChange] = useEdgesState([])
     const onConnect: OnConnect = useCallback(
         (connection) => setEdges((edges) => addEdge(connection, edges)),
         [setEdges]
@@ -83,9 +86,27 @@ const DiagramPage = () => {
     useEffect(() => {
         const query = location.state?.query || '';
         if (!query) return;
+        ws.sendPrompt(query);
+    }, [location])
 
-        
-    }, [])
+    ws.on(WSEvent.AddNode, (data : any) => {
+        const newNode = {
+            id: data.id,
+            type: 'common',
+            data: {
+                label: data.text,
+            },
+            position: data.position,
+        }
+
+        const newNodes = [...nodes, newNode]
+        setNodes(newNodes)
+    });
+
+    // ws.on(WSEvent.AddSubGraph, (data) => {
+    //     console.log(data);
+    // });
+
 
     return (
         <ReactFlow
