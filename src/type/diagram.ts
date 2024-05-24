@@ -10,6 +10,7 @@ export interface Position {
 
 export interface Vertex extends DiagramNode {
     position: Position
+    icon?: string
     sub_graph?: string
     id: string
     text: string
