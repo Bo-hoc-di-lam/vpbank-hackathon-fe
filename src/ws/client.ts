@@ -1,6 +1,6 @@
 
 import { Link, SubGraph, Vertex } from '@/type/diagram'
-import { Message, WSEvent, Prompt, MessageData, EditNode, GenerateIcon, IconType } from '@/type/ws_data'
+import { Message, WSEvent, Prompt, MessageData, EditNode, SystemTypeDTO, System } from '@/type/ws_data'
 
 type MessageCallback<T extends MessageData> = (msg: Message<T>) => void
 
@@ -17,8 +17,9 @@ interface WSEventMap {
     // user action
     [WSEvent.Prompt]: MessageCallback<Prompt>
     [WSEvent.PromptEdit]: MessageCallback<Prompt>
-    [WSEvent.GenerateIcon]: MessageCallback<GenerateIcon>
+    [WSEvent.GenerateIcon]: MessageCallback<SystemTypeDTO>
     [WSEvent.JoinRoom]: MessageCallback<string>
+    [WSEvent.GenerateCode]: MessageCallback<SystemTypeDTO>
 
     // server diagram response
     [WSEvent.AddNode]: MessageCallback<Vertex>
@@ -32,6 +33,7 @@ interface WSEventMap {
     [WSEvent.DelSubGraph]: MessageCallback<SubGraph>
     [WSEvent.SetNodePosition]: MessageCallback<Vertex>
     [WSEvent.SetComment]: MessageCallback<string>
+    [WSEvent.SetTerraform]: MessageCallback<string>
 
     // server diagram with custom icon response
     [WSEvent.AddNodeAWS]: MessageCallback<Vertex>
@@ -45,6 +47,7 @@ interface WSEventMap {
     [WSEvent.DelSubGraphAWS]: MessageCallback<SubGraph>
     [WSEvent.SetNodePositionAWS]: MessageCallback<Vertex>
     [WSEvent.SetCommentAWS]: MessageCallback<string>
+    [WSEvent.SetTerraformAWS]: MessageCallback<string>
 
     [key: string]: MessageCallback<any>
 }
@@ -71,14 +74,19 @@ export class WSClient {
         }
     }
 
-    constructor() {
-        this.ws = new WebSocket(import.meta.env.VITE_WS_URL)
+
+
+    constructor(nameplate?: string) {
+        if (!nameplate) {
+            this.ws = new WebSocket(`${import.meta.env.VITE_WS_URL}/ws`)
+        } else {
+            this.ws = new WebSocket(`${import.meta.env.VITE_WS_URL}/room/${nameplate}/ws`)
+        }
         this.ws.addEventListener('error', err => {
             console.error(err)
         })
         this.ws.addEventListener('open', () => {
             console.log('connected')
-            this.SendPrompt('Hello')
         })
         this.ws.addEventListener('close', () => {
 
@@ -96,8 +104,8 @@ export class WSClient {
         this.ws.send(JSON.stringify(data))
     }
 
-    public GenerateIcon(iconType: IconType) {
-        const data: Message<GenerateIcon> = {
+    public GenerateIcon(iconType: System) {
+        const data: Message<SystemTypeDTO> = {
             event: WSEvent.GenerateIcon,
             data: {
                 type: iconType
