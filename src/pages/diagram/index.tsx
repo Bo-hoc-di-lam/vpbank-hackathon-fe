@@ -1,5 +1,5 @@
 import Dagre from "@dagrejs/dagre"
-import { useCallback } from "react"
+import { useCallback, useEffect } from "react"
 import ReactFlow, {
     addEdge,
     Background,
@@ -10,6 +10,7 @@ import ReactFlow, {
     useNodesState,
     useReactFlow,
 } from "reactflow"
+import { useLocation } from 'react-router-dom';
 
 import { initialNodes, nodeTypes } from "../../nodes"
 import { initialEdges, edgeTypes } from "../../edges"
@@ -76,6 +77,15 @@ const DiagramPage = () => {
         })
         toggleDirection()
     }, [nodes, edges])
+    
+    // Handle input and render chart
+    const location = useLocation();
+    useEffect(() => {
+        const query = location.state?.query || '';
+        if (!query) return;
+
+        
+    }, [])
 
     return (
         <ReactFlow
