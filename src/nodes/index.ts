@@ -2,7 +2,8 @@ import type { Node, NodeTypes } from "reactflow"
 import { PositionLoggerNode } from "./PositionLoggerNode"
 import { StadiumShapedNode } from "./StadiumShapedNode"
 import { CircleNode } from "./CircleNode"
-import RhombusNode from "./RhombusNode"
+import { RhombusNode } from "./RhombusNode"
+import { CommonNode } from "./CommonNode"
 
 export const initialNodes = [
     {
@@ -17,7 +18,7 @@ export const initialNodes = [
     },
     {
         id: "B",
-        type: "default",
+        type: "common",
         data: { label: "child node 1" },
         position: { x: 10, y: 10 },
         parentNode: "A",
@@ -34,6 +35,7 @@ export const initialNodes = [
 ] satisfies Node[]
 
 export const nodeTypes = {
+    common: CommonNode,
     "position-logger": PositionLoggerNode,
     "stadium-shaped": StadiumShapedNode,
     circle: CircleNode,

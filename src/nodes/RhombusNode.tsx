@@ -5,7 +5,7 @@ export type RhombusNodeData = {
     label?: string
 }
 
-const RhombusNode = ({ data, selected }: NodeProps<RhombusNodeData>) => {
+export const RhombusNode = ({ data, selected }: NodeProps<RhombusNodeData>) => {
     return (
         <BaseNode selected={selected} className="w-20 h-20 transform rotate-45">
             {data.label && (
@@ -16,5 +16,3 @@ const RhombusNode = ({ data, selected }: NodeProps<RhombusNodeData>) => {
         </BaseNode>
     )
 }
-
-export default RhombusNode
