@@ -25,7 +25,7 @@ export const initialNodes = [
     },
     {
         id: "C",
-        type: "rhombus",
+        type: "circle",
         data: { label: "child node 2" },
         position: { x: 10, y: 90 },
         parentNode: "A",

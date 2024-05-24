@@ -5,17 +5,17 @@ import { Sidebar } from "./sidebar"
 import { Link } from "react-router-dom"
 import { ChatAside } from "./aside"
 
-interface MainLayoutProps {
+interface DiagramLayoutProps {
     title?: string
     sidebar?: boolean
     children?: React.ReactNode
 }
 
-export function MainLayout({
+export function DiagramLayout({
     title = "VPBank Hackathon | Team 100 | BHDL",
     sidebar = true,
     children,
-}: MainLayoutProps) {
+}: DiagramLayoutProps) {
     const [sidebarOpened, { open: openSidebar, close: closeSidebar }] =
         useDisclosure(false)
     const [chatOpened, { toggle: toggleChat }] = useDisclosure(true)
@@ -81,4 +81,4 @@ export function MainLayout({
     )
 }
 
-export default MainLayout
+export default DiagramLayout

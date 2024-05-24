@@ -1,4 +1,5 @@
-import { Handle, NodeProps, Position } from "reactflow"
+import { NodeProps } from "reactflow"
+import BaseNode from "./BaseNode"
 
 export type StadiumShapedNodeData = {
     label?: string
@@ -6,17 +7,13 @@ export type StadiumShapedNodeData = {
 
 export const StadiumShapedNode = ({
     data,
+    selected,
 }: NodeProps<StadiumShapedNodeData>) => {
     return (
-        <div className="border p-2.5 w-[150px] border-black rounded-[20px] bg-white">
+        <BaseNode selected={selected} className="w-[150px] rounded-[20px]">
             {data.label && (
                 <div className="text-center text-xs">{data.label}</div>
             )}
-
-            <Handle type="source" position={Position.Top} />
-            <Handle type="source" position={Position.Bottom} />
-            <Handle type="source" position={Position.Left} />
-            <Handle type="source" position={Position.Right} />
-        </div>
+        </BaseNode>
     )
 }

@@ -12,6 +12,7 @@ import "reactflow/dist/style.css"
 import Home from "./pages"
 import DiagramPage from "./pages/diagram"
 import { ReactFlowProvider } from "reactflow"
+import DiagramLayout from "./pages/diagram/layout"
 
 const queryClient = new QueryClient()
 
@@ -22,7 +23,13 @@ const router = createBrowserRouter([
     },
     {
         path: "/diagram",
-        element: <DiagramPage />,
+        element: <DiagramLayout />,
+        children: [
+            {
+                index: true,
+                element: <DiagramPage />,
+            },
+        ],
     },
 ])
 

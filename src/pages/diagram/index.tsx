@@ -13,7 +13,6 @@ import ReactFlow, {
 
 import { initialNodes, nodeTypes } from "../../nodes"
 import { initialEdges, edgeTypes } from "../../edges"
-import { MainLayout } from "../../components/layouts"
 import { useRemoveLogo } from "../../hooks"
 import { ActionIcon, Tooltip } from "@mantine/core"
 import { IconLayout } from "@tabler/icons-react"
@@ -79,35 +78,30 @@ const DiagramPage = () => {
     }, [nodes, edges])
 
     return (
-        <MainLayout>
-            <ReactFlow
-                nodes={nodes}
-                nodeTypes={nodeTypes}
-                onNodesChange={onNodesChange}
-                edges={edges}
-                edgeTypes={edgeTypes}
-                onEdgesChange={onEdgesChange}
-                onConnect={onConnect}
-                fitView
-                defaultEdgeOptions={{
-                    animated: true,
-                    type: "straight",
-                }}
-            >
-                <Panel position="top-left">
-                    <Tooltip
-                        label={directionRecords[direction]}
-                        position="right"
-                    >
-                        <ActionIcon onClick={onLayout}>
-                            <IconLayout />
-                        </ActionIcon>
-                    </Tooltip>
-                </Panel>
-                <Background />
-                <Controls />
-            </ReactFlow>
-        </MainLayout>
+        <ReactFlow
+            nodes={nodes}
+            nodeTypes={nodeTypes}
+            onNodesChange={onNodesChange}
+            edges={edges}
+            edgeTypes={edgeTypes}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            fitView
+            defaultEdgeOptions={{
+                animated: true,
+                type: "straight",
+            }}
+        >
+            <Panel position="top-left">
+                <Tooltip label={directionRecords[direction]} position="right">
+                    <ActionIcon onClick={onLayout}>
+                        <IconLayout />
+                    </ActionIcon>
+                </Tooltip>
+            </Panel>
+            <Background />
+            <Controls />
+        </ReactFlow>
     )
 }
 
