@@ -21,7 +21,6 @@ const BaseNode = ({ children, selected, className = "" }: BaseNodeProps) => {
     const handleClick = () => {
         toggleSelectedNode(nodeId!)
     }
-
     return (
         <>
             <NodeToolbar position={Position.Top} offset={0} align="end">
@@ -41,7 +40,6 @@ const BaseNode = ({ children, selected, className = "" }: BaseNodeProps) => {
                     className
                 )}
             >
-                <div>{nodeId}</div>
                 {children}
                 <Handle type="source" position={Position.Top} />
                 <Handle type="source" position={Position.Left} />
