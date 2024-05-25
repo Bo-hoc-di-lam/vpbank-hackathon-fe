@@ -41,7 +41,10 @@ const getLayoutedElements = (nodes: any, edges: any, options: any) => {
 
     return {
         nodes: nodes.map((node: any) => {
-            const { x, y } = g.node(node.id)
+            let { x, y } = g.node(node.id)
+
+            x = x * 3
+            y = y * 2
 
             return { ...node, position: { x, y } }
         }),
