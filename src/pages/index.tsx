@@ -1,7 +1,6 @@
 import { motion } from "framer-motion"
-import React, { useMemo } from "react"
+import { useMemo } from "react"
 import { AuroraBackground } from "../components/ui/aurora-background"
-import { useNavigate } from "react-router-dom"
 import { PlaceholdersAndVanishInput } from "../components/ui/placeholders-and-vanish-input"
 export default function Home() {
     const placeholders = useMemo(
@@ -14,7 +13,6 @@ export default function Home() {
         []
     )
 
-    const navigate = useNavigate()
     return (
         <AuroraBackground>
             <motion.div
@@ -39,12 +37,6 @@ export default function Home() {
                     // onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     //     console.log(e.target.value)
                     // }
-                    onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
-                        e.preventDefault()
-                        navigate("/diagram", {
-                            state: { query: e.currentTarget[0].value },
-                        })
-                    }}
                 />
             </motion.div>
         </AuroraBackground>

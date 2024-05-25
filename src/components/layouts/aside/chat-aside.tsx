@@ -1,3 +1,4 @@
+import { useDiagramManager } from "@/store/digaram-mananger-store"
 import {
     ActionIcon,
     AppShell,
@@ -16,31 +17,10 @@ interface Message {
 }
 
 const ChatAside = () => {
+    const diagramManager = useDiagramManager()
     const [conversation, handlers] = useListState<Message>([])
     const [chat, setChat] = useState<string>("")
     const [messaging, setMessaging] = useState<boolean>(false)
-    const botResponse = [
-        {
-            role: "bot",
-            message: "Hello there!",
-        },
-        {
-            role: "bot",
-            message: "General Kenobi!",
-        },
-        {
-            role: "bot",
-            message: "You are a bold one!",
-        },
-        {
-            role: "bot",
-            message: "I have the high ground!",
-        },
-        {
-            role: "bot",
-            message: "I hate you!",
-        },
-    ]
 
     const chatSectionViewport = useRef<HTMLDivElement>(null)
 
@@ -53,21 +33,9 @@ const ChatAside = () => {
         }, 100)
     }
 
-    const handleChat = () => {
-        setMessaging(true)
-        handlers.append({ role: "user", message: chat })
+    const handleChat = (prompt: string) => {
+        diagramManager.start(prompt)
         scrollBottom()
-        handlers.append({ role: "bot", message: "l" })
-        scrollBottom()
-        setTimeout(() => {
-            handlers.pop()
-            handlers.append(
-                botResponse[Math.floor(Math.random() * botResponse.length)]
-            )
-            setMessaging(false)
-        }, 1500)
-        scrollBottom()
-        setChat("")
     }
 
     return (
@@ -99,7 +67,7 @@ const ChatAside = () => {
                     <ActionIcon
                         aria-label="Send message"
                         size="lg"
-                        onClick={handleChat}
+                        onClick={() => handleChat(chat)}
                     >
                         <IconSend size={20} />
                     </ActionIcon>
