@@ -86,6 +86,8 @@ export class DiagramManager {
             }
 
             if(this.renderFunc) {
+                console.log("last render")
+                this.needRerender = true
                 this.renderFunc()
             }
 
