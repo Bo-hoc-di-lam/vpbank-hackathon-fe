@@ -164,10 +164,8 @@ const BaseNode = ({
                         )}
                     </div>
                 )}
-                <Handle type="source" position={Position.Top} />
-                <Handle type="source" position={Position.Left} />
-                <Handle type="target" position={Position.Bottom} />
-                <Handle type="target" position={Position.Right} />
+                <Handle type="source" position={Position.Right} />
+                <Handle type="target" position={Position.Left} />
             </div>
         </>
     )
