@@ -32,7 +32,7 @@ export class DiagramManager {
                     label: data.text,
                 },
                 position: data.position,
-                parentNode: data.sub_graph,
+                // parentNode: data.sub_graph,
             });
         });
     
@@ -67,17 +67,17 @@ export class DiagramManager {
 			}
         });
 
-        this.ws.on(WSEvent.AddSubGraph, (data: any) => {
-            this.needRerender = true;
-            this.subGraphs.push({ // Change from nodes to subGraphs
-                id: data.id,
-                type: 'group',
-                data: {
-                    label: data.text,
-                },
-                position: data.position,
-            });
-        });
+        // this.ws.on(WSEvent.AddSubGraph, (data: any) => {
+        //     this.needRerender = true;
+        //     this.subGraphs.push({ // Change from nodes to subGraphs
+        //         id: data.id,
+        //         type: 'group',
+        //         data: {
+        //             label: data.text,
+        //         },
+        //         position: data.position,
+        //     });
+        // });
 
 		this.ws.on(WSEvent.Done, () => {
             // clear interval
