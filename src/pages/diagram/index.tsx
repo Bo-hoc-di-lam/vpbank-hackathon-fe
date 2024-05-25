@@ -1,5 +1,4 @@
-import Dagre from "@dagrejs/dagre"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect } from "react";
 import ReactFlow, {
     addEdge,
     Background,
@@ -8,164 +7,142 @@ import ReactFlow, {
     useEdgesState,
     useNodesState,
     useReactFlow,
-} from "reactflow"
-import { useLocation } from "react-router-dom"
+    Node,
+    Edge,
+} from "reactflow";
+import { useLocation } from "react-router-dom";
+import ELK from "elkjs/lib/elk.bundled.js";
 
-import { nodeTypes } from "../../nodes"
-import { edgeTypes } from "../../edges"
-import { useRemoveLogo } from "../../hooks"
-import { useHotkeys } from "@mantine/hooks"
-import { DiagramManager } from "@/diagram/manager"
-import { useWtf } from "@/hooks/use-wtf"
+import { nodeTypes } from "../../nodes";
+import { edgeTypes } from "../../edges";
+import { useRemoveLogo } from "../../hooks";
+import { useWtf } from "@/hooks/use-wtf";
 import {
     getDiagramManager,
     useDiagramManager,
-} from "@/store/digaram-mananger-store"
+} from "@/store/digaram-mananger-store";
 
-const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}))
+const elk = new ELK();
 
-const getLayoutedElements = (nodes: any, edges: any, subGraphs: any, options: any) => {
-    g.setGraph({
-        rankdir: options.direction, 
-        width: 100,
-        height: 50
-    })
+const elkOptions = {
+    "elk.algorithm": "layered",
+    "elk.layered.spacing.nodeNodeBetweenLayers": "100",
+    "elk.spacing.nodeNode": "80",
+};
 
-    edges.forEach((edge: any) => g.setEdge(edge.source, edge.target))
-    nodes.forEach((node: any) => g.setNode(node.id, node))
 
-    try {
-        Dagre.layout(g)
-    } catch (error) {
-        console.error(error)
-        console.log("subGraphs", subGraphs)
-        console.log("nodes", nodes)
-        console.log("edges", edges)
-        console.log("g", g)
-    }
+const createGraph = (nodes, edges, subGraphs, options) => {
+    const isHorizontal = options?.["elk.direction"] === "RIGHT";
 
-    // map positions
-    nodes = nodes.map((node: any) => {
-        const { x, y } = g.node(node.id)
-        return { ...node, position: { x: x * 3, y: y * 2 } }
-    }) 
+    const createSubGraph = (parentNode, allNodes, allEdges) => {
+        const children = allNodes.filter(node => node.parentNode === parentNode.id);
+        const subGraphs = allNodes.filter(node => node.type === 'subgraph' && node.parentNode === parentNode.id);
 
-    // Calculate subGraph positions and sizes
-    subGraphs.forEach((subGraph: any) => {
-        const childNodes = nodes.filter((node: any) => node.parentNode === subGraph.id)
-        if (childNodes.length === 0) return
-        
-        const xPositions = childNodes.map((node: any) => node.position.x)
-        const yPositions = childNodes.map((node: any) => node.position.y)
+        return {
+            id: parentNode.id,
+            layoutOptions: options,
+            children: children.map(node => ({
+                ...node,
+                targetPosition: isHorizontal ? "left" : "top",
+                sourcePosition: isHorizontal ? "right" : "bottom",
+                width: 150,
+                height: 50,
+                ...createSubGraph(node, allNodes, allEdges)  // Recurse into subgraphs
+            })),
+            edges: allEdges.filter(edge => edge.source === parentNode.id || edge.target === parentNode.id)
+        };
+    };
 
-        const minX = Math.min(...xPositions)
-        const maxX = Math.max(...xPositions)
-        const minY = Math.min(...yPositions)
-        const maxY = Math.max(...yPositions)
-
-        // to draw a node x, width -> render at x - width
-        // each component is 100 x 50
-        // -> middle of each component is x + 50, y + 25
-        const midX = (minX + maxX) / 2
-        const midY = (minY + maxY) / 2
-
-        const block_width = 120
-        const block_height = 80
-        const width = maxX - minX + block_width
-        const height = maxY - minY + block_height
-
-        const subGraphX = midX - width / 2 + block_width / 4 + 20
-        const subGraphY = midY - height / 2 + block_height / 4 + 0
-
-        // subtract all children's positions
-        childNodes.forEach((node: any) => {
-            node.position.x -= subGraphX
-            node.position.y -= subGraphY
-        })
-
-        subGraph.position = { x: subGraphX, y: subGraphY }
-        subGraph.style = { width: width, height: height }
-    })
-
-    subGraphs = subGraphs.filter((subGraph: any) => subGraph.position)
-
-    // console.log("subGraphs", subGraphs)
+    const rootNodes = nodes.filter(node => !node.parentNode);
+    const rootSubGraphs = subGraphs.filter(subGraph => !subGraph.parentNode);
 
     return {
-        nodes,
-        edges,
-        subGraphs
+        id: "root",
+        layoutOptions: options,
+        children: rootNodes.map(node => ({
+            ...node,
+            targetPosition: isHorizontal ? "left" : "top",
+            sourcePosition: isHorizontal ? "right" : "bottom",
+            width: 150,
+            height: 50,
+            ...createSubGraph(node, nodes, edges)  // Recurse into subgraphs
+        })).concat(rootSubGraphs.map(subGraph => createSubGraph(subGraph, nodes, edges))),
+        edges: edges
+    };
+};
+
+const getLayoutedElements = async (nodes: Node<any>[], edges: Edge<any>[], subGraphs: Node<any>[], options: any) => {
+    const graph = createGraph(nodes, edges, subGraphs, options);
+
+    try {
+        const layoutedGraph = await elk.layout(graph);
+        const layoutedNodes = layoutedGraph.children.map((node) => ({
+            ...node,
+            position: { x: node.x, y: node.y },
+        }));
+
+        // console.log("layoutedGraph", layoutedGraph);
+        // console.log("layoutedNodes", layoutedNodes);
+
+        return {
+            nodes: layoutedNodes,
+            edges: layoutedGraph.edges,
+            subGraphs, // handle subGraphs here if needed
+        };
+    } catch (error) {
+        console.error(error);
+        return { nodes, edges, subGraphs };
     }
-}
+};
 
 const DiagramPage = () => {
-    useRemoveLogo()
-    useWtf()
+    useRemoveLogo();
+    useWtf();
 
-    const { fitView } = useReactFlow()
-    const [nodes, setNodes, onNodesChange] = useNodesState([])
-    const [edges, setEdges, onEdgesChange] = useEdgesState([])
+    const { fitView } = useReactFlow();
+    const [nodes, setNodes, onNodesChange] = useNodesState([]);
+    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
     const onConnect: OnConnect = useCallback(
-        (connection) => setEdges((edges) => addEdge(connection, edges)),
+        (connection) => setEdges((eds) => addEdge(connection, eds)),
         [setEdges]
-    )
+    );
 
- const setDiagram = (nodes: any, edges: any, subGraphs: any) => {
-        const layouted = getLayoutedElements(nodes, edges, subGraphs, { direction: 'TD' })
+    const setDiagram = async (nodes, edges, subGraphs) => {
+        const layouted = await getLayoutedElements(nodes, edges, subGraphs, { "elk.direction": "DOWN" });
 
-        setNodes([...layouted.nodes, ...layouted.subGraphs]) // Include subGraphs in nodes
-        setEdges([...layouted.edges])
+        setNodes([...layouted.nodes, ...layouted.subGraphs]); // Include subGraphs in nodes if necessary
+        setEdges([...layouted.edges]);
 
         window.requestAnimationFrame(() => {
-            fitView()
-        })
-    }
+            fitView();
+        });
+    };
 
-    const diagramManager = useDiagramManager()
+    const diagramManager = useDiagramManager();
 
     useEffect(() => {
-        const interval = setInterval(() => {
+        const interval = setInterval(async () => {
             if (!diagramManager.needRerender) {
-                // setDiagram(diagramManager.nodes, diagramManager.edges, diagramManager.subGraphs) // Pass subGraphs
+                await setDiagram(diagramManager.nodes, diagramManager.edges, diagramManager.subGraphs); // Pass subGraphs
                 if (!diagramManager.isGenerating) {
-                    return
+                    return;
                 }
-
-                return
+                return;
             }
 
-            console.log('rendering...')
-            setDiagram(diagramManager.nodes, diagramManager.edges, diagramManager.subGraphs) // Pass subGraphs
+            console.log("rendering...");
+            await setDiagram(diagramManager.nodes, diagramManager.edges, diagramManager.subGraphs); // Pass subGraphs
 
             diagramManager.needRerender = false;
         }, 500);
 
-        return () => { 
-            console.log('rendering final...')
-            setDiagram(diagramManager.nodes, diagramManager.edges, diagramManager.subGraphs) // Pass subGraphs
+        return () => {
+            console.log("rendering final...");
+            setDiagram(diagramManager.nodes, diagramManager.edges, diagramManager.subGraphs); // Pass subGraphs
             clearInterval(interval);
-        }
-    }, [])
-
-    // useEffect(() => {
-    //     const { needRerender, isGenerating } = diagramManagerState
-    //     console.log("rendering...", needRerender, isGenerating)
-
-    // if (!needRerender) {
-    //     if (!isGenerating) {
-    //         return
-    //     }
-
-    //     return
-    // }
-
-    // const isAutoLayout = diagramManager.isNeedGenLayout
-    // console.log("rendering...", isAutoLayout)
-    // setDiagram(diagramManager.nodes, diagramManager.edges, isAutoLayout)
-
-    // diagramManager.needRerender = false
-    // }, [diagramManagerState])
+        };
+    }, [diagramManager]);
 
     return (
         <ReactFlow
@@ -185,7 +162,7 @@ const DiagramPage = () => {
             <Background />
             <Controls />
         </ReactFlow>
-    )
-}
+    );
+};
 
-export default DiagramPage
+export default DiagramPage;
