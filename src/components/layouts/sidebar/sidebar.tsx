@@ -1,7 +1,7 @@
 import { ActionIcon, AppShell, Stack, Title, Tooltip } from "@mantine/core"
-import { IconEdit } from "@tabler/icons-react"
+import { IconEdit, IconChartBar } from "@tabler/icons-react"
 import { useMemo, useState } from "react"
-import { ManualEdit } from "./sidebar-items"
+import { ManualEdit, ViewMermaid } from "./sidebar-items"
 
 interface SidebarProps {
     openSidebar: () => void
@@ -21,6 +21,11 @@ const Sidebar = ({ openSidebar, closeSidebar }: SidebarProps) => {
                 icon: <IconEdit size={24} />,
                 label: "Manual edit",
                 chilren: <ManualEdit />,
+            },
+            {
+                icon: <IconChartBar size={24} />,
+                label: "View Mermaid Code",
+                chilren: <ViewMermaid />,
             },
         ]
     }, [])
@@ -64,7 +69,7 @@ const Sidebar = ({ openSidebar, closeSidebar }: SidebarProps) => {
                     ))}
                 </Stack>
             </div>
-            <AppShell.Navbar p="md" zIndex="10" ml={60}>
+            <AppShell.Navbar p="md" zIndex="10" ml={60} className="overflow-y-auto">
                 <AppShell.Section>
                     <Title order={4}>{activeItem?.label}</Title>
                 </AppShell.Section>

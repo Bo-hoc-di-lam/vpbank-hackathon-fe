@@ -8,8 +8,10 @@ export class DiagramManager {
     public isGenerating: boolean = false
     public needRerender: boolean = false
     public comment: string = ""
+	public mermaid: string = ""
 	private onCommentChangeHandlers: ((comment: string) => void)[] = []
 	private onDoneHandlers: (() => void)[] = []
+	private onMermaidHandlers: ((mermaid: string) => void)[] = []
 	
 
     private ws: WSClient
@@ -76,6 +78,7 @@ export class DiagramManager {
                 position: data.position,
             });
         });
+
 		this.ws.on(WSEvent.Done, () => {
 			// this.needRerender = true;
 			this.isGenerating = false;
@@ -86,7 +89,16 @@ export class DiagramManager {
 				})
 			}
 		});
-		
+
+		this.ws.on(WSEvent.Mermaid, (data: any) => {
+			this.mermaid = data
+
+			if (this.onMermaidHandlers) {
+				this.onMermaidHandlers.forEach(handler => {
+					handler(data)
+				})
+			}
+		})	
 	}
 
     public start(query: string) {
@@ -100,5 +112,9 @@ export class DiagramManager {
 
 	public onDone(handler: () => void) {
 		this.onDoneHandlers.push(handler)
+	}
+
+	public onMermaid(handler: (mermaid: string) => void) {
+		this.onMermaidHandlers.push(handler)
 	}
 }

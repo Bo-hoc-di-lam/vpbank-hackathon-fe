@@ -71,34 +71,6 @@ const ChatAside = () => {
             ]);
             scrollBottom();
         })
-
-
-        // const interval = setInterval(() => {
-        //     if (diagramManager.isGenerating) {
-        //         setMessaging(true)
-        //         coundHandlers.increment()
-        //         if (diagramManager.comment !== "") {
-        //             handlers.setItem(botChatIndex, {
-        //                 role: "bot",
-        //                 message: diagramManager.comment,
-        //             })
-        //             diagramManager.comment = ""
-        //         }
-        //     } else {
-        //         if (count > 0) {
-        //             handlers.append({
-        //                 role: "bot",
-        //                 message: "Done",
-        //             })
-        //         }
-        //         setMessaging(false)
-        //         scrollBottom()
-        //         clearInterval(interval)
-        //         diagramManager.needRerender = false
-        //     }
-        // }, 1000)
-
-        // return () => clearInterval(interval)
     }, [])
 
     return (
