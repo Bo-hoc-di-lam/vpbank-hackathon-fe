@@ -48,6 +48,11 @@ export class DiagramManager {
         //     }
         // });
 
+		this.ws.on(WSEvent.SetComment, (data: any) => {
+            this.needRerender = true
+            this.comment = data
+        });
+
         this.ws.on(WSEvent.AddSubGraph, (data: any) => {
             this.needRerender = true;
             this.nodes.push({
@@ -63,7 +68,6 @@ export class DiagramManager {
                 position: data.position,
             });
         });
-
 		this.ws.on(WSEvent.Done, () => {
 			// this.needRerender = true;
 			this.isGenerating = false;
