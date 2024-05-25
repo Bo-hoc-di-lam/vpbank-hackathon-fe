@@ -21,6 +21,7 @@ import {
     getDiagramManager,
     useDiagramManager,
 } from "@/store/digaram-mananger-store";
+import { clear } from "console";
 
 const elk = new ELK();
 
@@ -136,12 +137,8 @@ const DiagramPage = () => {
     const diagramManager = useDiagramManager();
 
     useEffect(() => {
-        const interval = setInterval(async () => {
+        diagramManager.setInterval(async () => {
             if (!diagramManager.needRerender) {
-                await setDiagram(diagramManager.nodes, diagramManager.edges, diagramManager.subGraphs); // Pass subGraphs
-                if (!diagramManager.isGenerating) {
-                    return;
-                }
                 return;
             }
 
@@ -152,9 +149,12 @@ const DiagramPage = () => {
         }, 500);
 
         return () => {
-            console.log("rendering final...");
-            setDiagram(diagramManager.nodes, diagramManager.edges, diagramManager.subGraphs); // Pass subGraphs
-            clearInterval(interval);
+            // console.log("rendering final...");
+            // setDiagram(diagramManager.nodes, diagramManager.edges, diagramManager.subGraphs); // Pass subGraphs
+
+            if (diagramManager.interval) {
+                clearInterval(diagramManager.interval);
+            }
         };
     }, [diagramManager]);
 

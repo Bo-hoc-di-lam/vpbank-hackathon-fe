@@ -10,10 +10,13 @@ export class DiagramManager {
     public needRerender: boolean = false
     public comment: string = ""
 	public mermaid: string = ""
+
 	private onCommentChangeHandlers: ((comment: string) => void)[] = []
 	private onDoneHandlers: (() => void)[] = []
 	private onMermaidHandlers: ((mermaid: string) => void)[] = []
-	
+    private renderFunc: () => void
+    private intervalTime: number = 0.5 * 1000
+    public interval : NodeJS.Timeout | null = null
 
     private ws: WSClient
 
@@ -77,8 +80,10 @@ export class DiagramManager {
         });
 
 		this.ws.on(WSEvent.Done, () => {
-			// this.needRerender = true;
-			this.isGenerating = false;
+            // clear interval
+            if (this.interval) {
+                clearInterval(this.interval)
+            }
 
 			if (this.onDoneHandlers) {
 				this.onDoneHandlers.forEach(handler => {
@@ -100,6 +105,16 @@ export class DiagramManager {
 
     public start(query: string) {
         this.isGenerating = true
+
+        // set interval fror renderFunc to update diagram
+        if (this.renderFunc) {
+            if (this.interval) {
+                clearInterval(this.interval)
+            }
+            
+            this.interval = setInterval(this.renderFunc, this.intervalTime)
+        }
+
         this.ws.sendPrompt(query)
     }
 
@@ -114,4 +129,9 @@ export class DiagramManager {
 	public onMermaid(handler: (mermaid: string) => void) {
 		this.onMermaidHandlers.push(handler)
 	}
+
+    public setInterval(renderFunc: () => void, intervalTime: number) {
+        this.renderFunc = renderFunc
+        this.intervalTime = intervalTime
+    }
 }
