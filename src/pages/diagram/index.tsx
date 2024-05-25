@@ -1,5 +1,5 @@
 import Dagre from "@dagrejs/dagre"
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useState } from "react"
 import ReactFlow, {
     addEdge,
     Background,
@@ -17,7 +17,10 @@ import { useRemoveLogo } from "../../hooks"
 import { useHotkeys } from "@mantine/hooks"
 import { DiagramManager } from "@/diagram/manager"
 import { useWtf } from "@/hooks/use-wtf"
-import { useDiagramManager } from "@/store/digaram-mananger-store"
+import {
+    getDiagramManager,
+    useDiagramManager,
+} from "@/store/digaram-mananger-store"
 
 const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}))
 
@@ -31,10 +34,7 @@ const getLayoutedElements = (nodes: any, edges: any, options: any) => {
 
     return {
         nodes: nodes.map((node: any) => {
-            let { x, y } = g.node(node.id)
-
-            x = x * 3
-            y = y * 2
+            const { x, y } = g.node(node.id)
 
             return { ...node, position: { x, y } }
         }),
@@ -83,25 +83,38 @@ const DiagramPage = () => {
     // Handle input and render chart
     useEffect(() => {
         const interval = setInterval(() => {
-            const { needRerender, isGenerating } = diagramManager
-
-            if (!needRerender) {
-                if (!isGenerating) {
-                    clearInterval(interval)
+            if (!diagramManager.needRerender) {
+                if (!diagramManager.isGenerating) {
+                    return
                 }
 
                 return
             }
-
             const isAutoLayout = diagramManager.isNeedGenLayout
-            console.log("rendering...", isAutoLayout)
             setDiagram(diagramManager.nodes, diagramManager.edges, isAutoLayout)
-
-            diagramManager.needRerender = false
         }, 1000)
 
         return () => clearInterval(interval)
     }, [])
+
+    // useEffect(() => {
+    //     const { needRerender, isGenerating } = diagramManagerState
+    //     console.log("rendering...", needRerender, isGenerating)
+
+    // if (!needRerender) {
+    //     if (!isGenerating) {
+    //         return
+    //     }
+
+    //     return
+    // }
+
+    // const isAutoLayout = diagramManager.isNeedGenLayout
+    // console.log("rendering...", isAutoLayout)
+    // setDiagram(diagramManager.nodes, diagramManager.edges, isAutoLayout)
+
+    // diagramManager.needRerender = false
+    // }, [diagramManagerState])
 
     return (
         <ReactFlow

@@ -21,3 +21,6 @@ const diagramManagerSelector = (
 
 export const useDiagramManager = () =>
     useDiagramManagerStore(diagramManagerSelector)
+
+export const getDiagramManager = () =>
+    diagramManagerSelector(useDiagramManagerStore.getState())
