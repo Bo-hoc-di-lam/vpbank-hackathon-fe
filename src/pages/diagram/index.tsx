@@ -74,16 +74,11 @@ const DiagramPage = () => {
         [setEdges]
     )
 
-    const setDiagram = (nodes: any, edges: any, autoLayout: boolean = false) => {
-        if (autoLayout) {
-            const layouted = getLayoutedElements(nodes, edges, { direction: 'LR' })
+    const setDiagram = (nodes: any, edges: any) => {
+        const layouted = getLayoutedElements(nodes, edges, { direction: 'TD' })
 
-            setNodes([...layouted.nodes])
-            setEdges([...layouted.edges])
-        } else {
-            setNodes([...nodes])
-            setEdges([...edges])
-        }
+        setNodes([...layouted.nodes])
+        setEdges([...layouted.edges])
 
         window.requestAnimationFrame(() => {
             fitView()
@@ -111,12 +106,11 @@ const DiagramPage = () => {
                 return;
             }
 
-            const isAutoLayout = diagramManager.isNeedGenLayout;
-            console.log('rendering...', isAutoLayout)
-            setDiagram(diagramManager.nodes, diagramManager.edges, isAutoLayout)
+            console.log('rendering...')
+            setDiagram(diagramManager.nodes, diagramManager.edges)
 
             diagramManager.needRerender = false;
-        }, 1000);
+        }, 500);
 
         return () => clearInterval(interval);
     }, [])

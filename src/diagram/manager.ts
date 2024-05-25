@@ -9,7 +9,6 @@ export class DiagramManager {
 	public nodes: Node<any>[] = [];
 	public edges: Edge<any>[] = [];
 	public isGenerating: boolean = false;
-	public isNeedGenLayout: boolean = false;
 	public needRerender: boolean = false;
 
 	private ws: WSClient;
@@ -26,6 +25,7 @@ export class DiagramManager {
                     label: data.text,
                 },
                 position: data.position,
+                parentNode: data.sub_graph,
             });
         });
     
@@ -35,21 +35,39 @@ export class DiagramManager {
                 id: data.id,
                 source: data.from_id,
                 target: data.to_id,
-                ariaLabel: data.text,
+                data: {
+					label: data.text,
+				}
             });
         });
     
-        this.ws.on(WSEvent.SetNodePosition, (data: any) => {
-			this.needRerender = true;
-			this.isNeedGenLayout = false;
-            const node = this.nodes.find(n => n.id === data.id);
-            if (node) {
-                node.position = data.position;
-            }
+        // this.ws.on(WSEvent.SetNodePosition, (data: any) => {
+		// 	this.needRerender = true;
+		// 	this.isNeedGenLayout = false;
+        //     const node = this.nodes.find(n => n.id === data.id);
+        //     if (node) {
+        //         node.position = data.position;
+        //     }
+        // });
+
+        this.ws.on(WSEvent.AddSubGraph, (data: any) => {
+            this.needRerender = true;
+            this.nodes.push({
+                id: data.id,
+                type: 'group',
+                data: {
+                    label: data.text,
+                },
+                // style: {
+                //     width: 400,
+                //     height: 300,
+                // },
+                position: data.position,
+            });
         });
 
 		this.ws.on(WSEvent.Done, () => {
-			this.needRerender = true;
+			// this.needRerender = true;
 			this.isGenerating = false;
 		});
 	}
