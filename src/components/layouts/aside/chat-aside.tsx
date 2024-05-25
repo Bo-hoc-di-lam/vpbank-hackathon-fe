@@ -43,7 +43,7 @@ const ChatAside = () => {
         handlers.append({ role: "user", message: prompt })
         scrollBottom()
         handlers.append({ role: "bot", message: "l" })
-        setBotChatIndex(conversation.length - 1)
+        setBotChatIndex(conversation.length + 1)
         console.log(conversation)
 
         scrollBottom()
@@ -54,20 +54,17 @@ const ChatAside = () => {
             if (diagramManager.needRerender) {
                 if (diagramManager.isGenerating) {
                     setMessaging(true)
+                    coundHandlers.increment()
                     if (diagramManager.comment !== "") {
-                        console.log("comment", diagramManager.comment)
-                        console.log("botChatIndex", botChatIndex)
-
                         handlers.setItem(botChatIndex, {
                             role: "bot",
                             message: diagramManager.comment,
                         })
                         diagramManager.comment = ""
                     }
-                    coundHandlers.increment()
                 } else {
                     if (count > 0) {
-                        handlers.setItem(botChatIndex, {
+                        handlers.append({
                             role: "bot",
                             message: "Done",
                         })
@@ -75,6 +72,7 @@ const ChatAside = () => {
                     setMessaging(false)
                     scrollBottom()
                     clearInterval(interval)
+                    diagramManager.needRerender = false
                 }
             }
         }, 1000)
