@@ -145,7 +145,7 @@ const BaseNode = ({
                 className={cn(
                     ` ${selected ? "border-2" : "border"} ${
                         isNodeSelected ? "border-green-600" : "border-black"
-                    } p-2.5 bg-white flex items-center justify-center`,
+                    } p-2.5 bg-white flex items-center justify-center z-50 relative`,
                     className
                 )}
             >

@@ -98,7 +98,7 @@ const processsubGraph = (subGraph: any): any => {
             output = output.concat(processsubGraph(child));
         });
 
-        node.type = 'group';
+        node.type = 'custom-group';
         node.style = {
             width: subGraph.width,
             height: subGraph.height,
@@ -116,6 +116,17 @@ const getLayoutedElements = async (nodes, edges, subGraphs, options) => {
     try {
         const layoutedGraph = await elk.layout(graph);
         const nodes = layoutedGraph.children.map(processsubGraph).flat()
+
+        // sort to bring subGraphs to top
+        nodes.sort((a, b) => {
+            if (a.type === 'custom-group' && b.type !== 'custom-group') {
+                return 1;
+            }
+            if (a.type !== 'custom-group' && b.type === 'custom-group') {
+                return -1;
+            }
+            return 0;
+        });
 
         return {
             nodes,
