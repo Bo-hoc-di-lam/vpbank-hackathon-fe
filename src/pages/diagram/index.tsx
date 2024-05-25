@@ -82,18 +82,18 @@ const getLayoutedElements = async (nodes, edges, subGraphs, options) => {
             position: { x: subGraph.x, y: subGraph.y },
             width: subGraph.width,
             height: subGraph.height,
-            style: { width: subGraph.width, height: subGraph.height}
+            style: { width: subGraph.width, height: subGraph.height }
         }));
 
         const layoutedNodes = subGraphs.map(subGraph => {
             return subGraph.children
         }).flat().map(
             node => ({
-            ...node,
-            position: { x: node.x, y: node.y },
-            width: node.width,
-            height: node.height,
-        }));
+                ...node,
+                position: { x: node.x, y: node.y },
+                width: node.width,
+                height: node.height,
+            }));
 
         console.log(layoutedNodes);
 
@@ -123,6 +123,7 @@ const DiagramPage = () => {
         [setEdges]
     );
 
+
     const setDiagram = async (nodes, edges, subGraphs) => {
         const layouted = await getLayoutedElements(nodes, edges, subGraphs, { "elk.direction": "DOWN" });
 
@@ -135,6 +136,11 @@ const DiagramPage = () => {
     };
 
     const diagramManager = useDiagramManager();
+
+
+    const onSelectionChange = ({ nodes, edges }) => {
+        diagramManager.setSelectedNodes(nodes);
+    }
 
     useEffect(() => {
         diagramManager.setInterval(async () => {
@@ -163,6 +169,7 @@ const DiagramPage = () => {
             nodes={nodes}
             nodeTypes={nodeTypes}
             onNodesChange={onNodesChange}
+            onSelectionChange={onSelectionChange}
             edges={edges}
             edgeTypes={edgeTypes}
             onEdgesChange={onEdgesChange}

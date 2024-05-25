@@ -1,22 +1,28 @@
+import { initialEdges } from "@/edges"
+import { initialNodes, nodeTypes } from "@/nodes"
+import { Vertex } from "@/type/diagram"
 import { WSEvent } from "@/type/ws_data"
 import { WSClient } from "@/ws/client"
+import { title } from "process"
 import { Node, Edge } from "reactflow"
 
 export class DiagramManager {
     public nodes: Node<any>[] = []
     public edges: Edge<any>[] = []
     public subGraphs: Node<any>[] = [] // Add this line
+    public selectedNodes: Node<any>[] = []
     public isGenerating: boolean = false
     public needRerender: boolean = false
     public comment: string = ""
-	public mermaid: string = ""
+    public mermaid: string = ""
 
-	private onCommentChangeHandlers: ((comment: string) => void)[] = []
-	private onDoneHandlers: (() => void)[] = []
-	private onMermaidHandlers: ((mermaid: string) => void)[] = []
+    private onCommentChangeHandlers: ((comment: string) => void)[] = []
+    private onDoneHandlers: (() => void)[] = []
+    private onMermaidHandlers: ((mermaid: string) => void)[] = []
     private renderFunc: () => void
     private intervalTime: number = 0.5 * 1000
-    public interval : NodeJS.Timeout | null = null
+    public interval: NodeJS.Timeout | null = null
+    private started: boolean = false
 
     private ws: WSClient
 
@@ -35,7 +41,7 @@ export class DiagramManager {
                 parentNode: data.sub_graph,
             });
         });
-    
+
         this.ws.on(WSEvent.AddLink, (data: any) => {
             this.needRerender = true
             this.edges.push({
@@ -47,24 +53,28 @@ export class DiagramManager {
                 }
             });
         });
-    
+
         // this.ws.on(WSEvent.SetNodePosition, (data: any) => {
-		// 	this.needRerender = true;
-		// 	this.isNeedGenLayout = false;
+        // 	this.needRerender = true;
+        // 	this.isNeedGenLayout = false;
         //     const node = this.nodes.find(n => n.id === data.id);
         //     if (node) {
         //         node.position = data.position;
         //     }
         // });
 
-		this.ws.on(WSEvent.SetComment, (data: any) => {
+        this.ws.on(WSEvent.Reset, (data: any) => {
+            this.clearData()
+        })
+
+        this.ws.on(WSEvent.SetComment, (data: any) => {
             this.comment = data
 
-			if (this.onCommentChangeHandlers) {
-				this.onCommentChangeHandlers.forEach(handler => {
-					handler(data)
-				})
-			}
+            if (this.onCommentChangeHandlers) {
+                this.onCommentChangeHandlers.forEach(handler => {
+                    handler(data)
+                })
+            }
         });
 
         this.ws.on(WSEvent.AddSubGraph, (data: any) => {
@@ -79,59 +89,116 @@ export class DiagramManager {
             });
         });
 
-		this.ws.on(WSEvent.Done, () => {
+        this.ws.on(WSEvent.Done, () => {
             // clear interval
             if (this.interval) {
                 clearInterval(this.interval)
             }
 
-			if (this.onDoneHandlers) {
-				this.onDoneHandlers.forEach(handler => {
-					handler()
-				})
-			}
-		});
+            if (this.onDoneHandlers) {
+                this.onDoneHandlers.forEach(handler => {
+                    handler()
+                })
+            }
+        });
 
-		this.ws.on(WSEvent.Mermaid, (data: any) => {
-			this.mermaid = data
+        this.ws.on(WSEvent.Mermaid, (data: any) => {
+            this.mermaid = data
 
-			if (this.onMermaidHandlers) {
-				this.onMermaidHandlers.forEach(handler => {
-					handler(data)
-				})
-			}
-		})	
-	}
+            if (this.onMermaidHandlers) {
+                this.onMermaidHandlers.forEach(handler => {
+                    handler(data)
+                })
+            }
+        })
+    }
 
     public start(query: string) {
         this.isGenerating = true
-
         // set interval fror renderFunc to update diagram
-        if (this.renderFunc) {
-            if (this.interval) {
-                clearInterval(this.interval)
-            }
-            
-            this.interval = setInterval(this.renderFunc, this.intervalTime)
+        this.resetInterval()
+        if (this.started) {
+            this.ws.sendEditPrompt(query, this.selectedVertex().map(e => ({ id: e.id, text: e.data.label })))
+        } else {
+            this.ws.sendPrompt(query)
         }
-
-        this.ws.sendPrompt(query)
+        this.started = true
+    }
+    public edit(query: string) {
+        this.isGenerating = true
+        this.resetInterval()
+        const vertex: Vertex[] = this.selectedVertex().
+            map(node => ({
+                position: { x: 0, y: 0 },
+                id: node.id,
+                text: node.data.label
+            }))
+        this.ws.sendEditPrompt(query, vertex)
     }
 
-	public onCommentChange(handler: (comment: string) => void) {
-		this.onCommentChangeHandlers.push(handler)
-	}
+    public onCommentChange(handler: (comment: string) => void) {
+        this.onCommentChangeHandlers.push(handler)
+    }
 
-	public onDone(handler: () => void) {
-		this.onDoneHandlers.push(handler)
-	}
+    public onDone(handler: () => void) {
+        this.onDoneHandlers.push(handler)
+    }
 
-	public onMermaid(handler: (mermaid: string) => void) {
-		this.onMermaidHandlers.push(handler)
-	}
+    public onMermaid(handler: (mermaid: string) => void) {
+        this.onMermaidHandlers.push(handler)
+    }
 
     public setInterval(renderFunc: () => void, intervalTime: number) {
         this.renderFunc = renderFunc
         this.intervalTime = intervalTime
+    }
+
+    public setSelectedNodes(nodes: Node<any>[]) {
+        this.selectedNodes = nodes
+        console.log("selected nodes", this.selectedNodes)
+        console.log("vertex", this.selectedVertex())
+
+    }
+
+
+    // private methods
+    private clearData() {
+        this.nodes.length = 0
+        this.edges.length = 0
+        this.subGraphs.length = 0
+    }
+
+    private selectedVertex(): Node<any>[] {
+        return this.selectedNodes.reduce((acc, node) => {
+            switch (node.type) {
+                default:
+                    return [...acc, node]
+                case 'group':
+                    return [...acc, ...this.nodeInGroup(node.id)]
+            }
+        }, [])
+    }
+
+    private resetInterval() {
+        if (this.renderFunc) {
+            if (this.interval) {
+                clearInterval(this.interval)
+            }
+
+            this.interval = setInterval(this.renderFunc, this.intervalTime)
+        }
+    }
+
+    private nodeInGroup(group: string) {
+        console.log("group", group)
+        let nodes = this.nodes.filter(node => node.parentNode === group)
+        // nested child group
+        let subGroups = this.subGraphs.filter(node => node.parentNode === group)
+        let childNodes = subGroups.reduce((acc, node) => {
+            let childNodes = this.nodeInGroup(node.id)
+            return [...acc, ...childNodes]
+        }, [])
+
+        return [...nodes, ...childNodes]
     }
 }

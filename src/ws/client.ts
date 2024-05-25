@@ -13,6 +13,7 @@ interface WSEventMap {
     [WSEvent.Done]: MessageCallback<any>
     [WSEvent.Mermaid]: MessageCallback<string>
     [WSEvent.RoomInfo]: MessageCallback<string>
+    [WSEvent.Reset]: MessageCallback<any>
 
     // user action
     [WSEvent.Prompt]: MessageCallback<Prompt>
@@ -81,6 +82,7 @@ export class WSClient {
 
     private async sendMessage(data: Message<any>) {
         await this.waitForConnection()
+        console.info("send", data)
         this.ws.send(JSON.stringify(data))
     }
 
@@ -125,7 +127,7 @@ export class WSClient {
                 edit_nodes: editNodeDTOs
             }
         }
-        this.ws.send(JSON.stringify(data))
+        this.sendMessage(data)
     }
 
     public on<T extends WSEvent>(evt: T, callback: WSEventMap[T]) {
