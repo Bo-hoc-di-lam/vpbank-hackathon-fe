@@ -13,6 +13,7 @@ export enum WSEvent {
     Done = "DONE",
     Mermaid = "MERMAID",
     RoomInfo = 'ROOM_INFO',
+    Reset = "RESET",
 
     // user action
     Prompt = 'PROMPT',

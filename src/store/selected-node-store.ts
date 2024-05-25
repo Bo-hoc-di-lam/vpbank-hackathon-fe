@@ -8,12 +8,14 @@ interface SelectedNodeStore {
 
 export const useSelectedNodeStore = create<SelectedNodeStore>((set) => ({
     nodes: [],
-    toggleSelectedNode: (node: string) =>
+    toggleSelectedNode: (node: string) => {
+        console.log("toggleSelectedNode", node)
         set((state) => ({
             nodes: state.nodes.includes(node)
                 ? state.nodes.filter((n) => n !== node)
                 : [...state.nodes, node],
-        })),
+        }))
+    },
     clearSelectedNodes: () => set(() => ({ nodes: [] })),
 }))
 

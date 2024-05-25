@@ -153,6 +153,7 @@ const DiagramPage = () => {
         [setEdges]
     );
 
+
     const setDiagram = async (nodes, edges, subGraphs) => {
         const layouted = await getLayoutedElements(nodes, edges, subGraphs, { "elk.direction": "DOWN" });
 
@@ -165,6 +166,11 @@ const DiagramPage = () => {
     };
 
     const diagramManager = useDiagramManager();
+
+
+    const onSelectionChange = ({ nodes, edges }) => {
+        diagramManager.setSelectedNodes(nodes);
+    }
 
     useEffect(() => {
         diagramManager.setInterval(async () => {
@@ -192,6 +198,7 @@ const DiagramPage = () => {
             nodes={nodes}
             nodeTypes={nodeTypes}
             onNodesChange={onNodesChange}
+            onSelectionChange={onSelectionChange}
             edges={edges}
             edgeTypes={edgeTypes}
             onEdgesChange={onEdgesChange}
