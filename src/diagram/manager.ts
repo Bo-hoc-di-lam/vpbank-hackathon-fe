@@ -8,6 +8,7 @@ export class DiagramManager {
     public isGenerating: boolean = false
     public needRerender: boolean = false
     public comment: string = ""
+	public onCommentChangeHandlers: ((comment: string) => void)[] = []
 
     private ws: WSClient
 
@@ -49,8 +50,13 @@ export class DiagramManager {
         // });
 
 		this.ws.on(WSEvent.SetComment, (data: any) => {
-            this.needRerender = true
             this.comment = data
+
+			if (this.onCommentChangeHandlers) {
+				this.onCommentChangeHandlers.forEach(handler => {
+					handler(data)
+				})
+			}
         });
 
         this.ws.on(WSEvent.AddSubGraph, (data: any) => {
@@ -72,10 +78,15 @@ export class DiagramManager {
 			// this.needRerender = true;
 			this.isGenerating = false;
 		});
+		
 	}
 
     public start(query: string) {
         this.isGenerating = true
         this.ws.sendPrompt(query)
     }
+
+	public onCommentChange(handler: (comment: string) => void) {
+		this.onCommentChangeHandlers.push(handler)
+	}
 }
