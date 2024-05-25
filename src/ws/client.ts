@@ -76,27 +76,23 @@ export class WSClient {
         this.ws.addEventListener('error', err => {
             console.error(err)
         })
-        this.ws.addEventListener('open', () => {
-            console.log('connected')
-            this.SendPrompt('Hello')
-        })
-        this.ws.addEventListener('close', () => {
-
-        })
-        this.ws.addEventListener('message', this.handleEvent)
+        this.ws.addEventListener('message', this.handleEvent.bind(this))
     }
 
+    private async sendMessage(data: Message<any>) {
+        await this.waitForConnection()
+        this.ws.send(JSON.stringify(data))
+    }
 
-
-    public JoinRoom(nameplate: string) {
+    public joinRoom(nameplate: string) {
         const data: Message<string> = {
             event: WSEvent.JoinRoom,
             data: nameplate
         }
-        this.ws.send(JSON.stringify(data))
+        this.sendMessage(data)
     }
 
-    public GenerateIcon(iconType: IconType) {
+    public generateIcon(iconType: IconType) {
         const data: Message<GenerateIcon> = {
             event: WSEvent.GenerateIcon,
             data: {
@@ -107,17 +103,17 @@ export class WSClient {
     }
 
 
-    public SendPrompt(prompt: string) {
+    public sendPrompt(prompt: string) {
         const data: Message<Prompt> = {
             event: WSEvent.Prompt,
             data: {
                 input: prompt
             }
         }
-        this.ws.send(JSON.stringify(data))
+        this.sendMessage(data)
     }
 
-    public SendEditPrompt(prompt: string, editNodes: Vertex[]) {
+    public sendEditPrompt(prompt: string, editNodes: Vertex[]) {
         const editNodeDTOs: EditNode[] = editNodes.map(node => ({
             node_id: node.id,
             title: node.text
@@ -132,17 +128,25 @@ export class WSClient {
         this.ws.send(JSON.stringify(data))
     }
 
-    public On<T extends WSEvent>(evt: T, callback: WSEventMap[T]) {
+    public on<T extends WSEvent>(evt: T, callback: WSEventMap[T]) {
         this.eventHandler[evt] = callback
     }
-    public Nameplate(): string {
+    public nameplate(): string {
         return this.roomNameplate
     }
 
     private handleEvent(msg: MessageEvent<any>) {
         const data = msg.data
-        var event: Message<any> = JSON.parse(data)
+        const event: Message<any> = JSON.parse(data)
+
+        console.log(event)
         this.staticHandler[event.event as WSEvent]?.(event.data)
         this.eventHandler[event.event as WSEvent]?.(event.data)
+    }
+
+    private async waitForConnection() {
+        while (this.ws.readyState !== WebSocket.OPEN) {
+            await new Promise(resolve => setTimeout(resolve, 100))
+        }
     }
 }

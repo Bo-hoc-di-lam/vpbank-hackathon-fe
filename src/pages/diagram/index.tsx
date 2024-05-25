@@ -1,22 +1,26 @@
 import Dagre from "@dagrejs/dagre"
-import { useCallback } from "react"
+import { useCallback, useEffect } from "react"
 import ReactFlow, {
     addEdge,
     Background,
     Controls,
+    Node,
     OnConnect,
     Panel,
     useEdgesState,
     useNodesState,
     useReactFlow,
+    Edge,
 } from "reactflow"
+import { useLocation } from 'react-router-dom';
 
-import { initialNodes, nodeTypes } from "../../nodes"
-import { initialEdges, edgeTypes } from "../../edges"
+import { nodeTypes } from "../../nodes"
+import { edgeTypes } from "../../edges"
 import { useRemoveLogo } from "../../hooks"
 import { ActionIcon, Tooltip } from "@mantine/core"
 import { IconLayout } from "@tabler/icons-react"
 import { useHotkeys, useToggle } from "@mantine/hooks"
+import { DiagramManager } from "@/diagram/manager";
 
 const directionRecords: Record<string, string> = {
     TB: "Top to Bottom",
@@ -44,9 +48,11 @@ const getLayoutedElements = (nodes: any, edges: any, options: any) => {
         edges,
     }
 }
+
+const diagramManager = new DiagramManager()
+
 const DiagramPage = () => {
     useRemoveLogo()
-
     useHotkeys([
         [
             "A+A",
@@ -55,27 +61,63 @@ const DiagramPage = () => {
                     "https://www.youtube.com/watch?v=dQw4w9WgXcQ"),
         ],
     ])
-    const [direction, toggleDirection] = useToggle(["TB", "BT", "RL", "LR"])
 
     const { fitView } = useReactFlow()
-    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
-    const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
+    const [nodes, setNodes, onNodesChange] = useNodesState([])
+    const [edges, setEdges, onEdgesChange] = useEdgesState([])
+
     const onConnect: OnConnect = useCallback(
         (connection) => setEdges((edges) => addEdge(connection, edges)),
         [setEdges]
     )
 
-    const onLayout = useCallback(() => {
-        const layouted = getLayoutedElements(nodes, edges, { direction })
+    const setDiagram = (nodes: any, edges: any, autoLayout: boolean = false) => {
+        if (autoLayout) {
+            const layouted = getLayoutedElements(nodes, edges, { direction: 'LR' })
 
-        setNodes([...layouted.nodes])
-        setEdges([...layouted.edges])
+            setNodes([...layouted.nodes])
+            setEdges([...layouted.edges])
+        } else {
+            setNodes([...nodes])
+            setEdges([...edges])
+        }
 
         window.requestAnimationFrame(() => {
             fitView()
         })
-        toggleDirection()
-    }, [nodes, edges])
+        // toggleDirection()
+    }
+    
+    // Handle input and render chart
+    const location = useLocation();
+    useEffect(() => {
+        const query = location.state?.query || '';
+        if (!query) return;
+
+        diagramManager.start(query);
+
+        // create interval to render every 1 second
+        const interval = setInterval(() => {
+            const { needRerender, isGenerating } = diagramManager;
+
+            if (!needRerender) {
+                if (!isGenerating) {
+                    clearInterval(interval);
+                }
+
+                return;
+            }
+
+            const isAutoLayout = diagramManager.isNeedGenLayout;
+            console.log('rendering...', isAutoLayout)
+            setDiagram(diagramManager.nodes, diagramManager.edges, isAutoLayout)
+
+            diagramManager.needRerender = false;
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [])
+
 
     return (
         <ReactFlow
@@ -92,13 +134,13 @@ const DiagramPage = () => {
                 type: "straight",
             }}
         >
-            <Panel position="top-left">
+            {/* <Panel position="top-left">
                 <Tooltip label={directionRecords[direction]} position="right">
                     <ActionIcon onClick={onLayout}>
                         <IconLayout />
                     </ActionIcon>
                 </Tooltip>
-            </Panel>
+            </Panel> */}
             <Background />
             <Controls />
         </ReactFlow>

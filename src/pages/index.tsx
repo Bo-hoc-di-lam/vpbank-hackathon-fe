@@ -36,12 +36,14 @@ export default function Home() {
 
                 <PlaceholdersAndVanishInput
                     placeholders={placeholders}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        console.log(e.target.value)
-                    }
+                    // onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    //     console.log(e.target.value)
+                    // }
                     onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
                         e.preventDefault()
-                        navigate("/diagram")
+                        navigate("/diagram", {
+                            state: { query: e.currentTarget[0].value },
+                        })
                     }}
                 />
             </motion.div>
