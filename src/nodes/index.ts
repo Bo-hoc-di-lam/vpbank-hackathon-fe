@@ -3,6 +3,7 @@ import { StadiumShapedNode } from "./StadiumShapedNode"
 import { CircleNode } from "./CircleNode"
 import { RhombusNode } from "./RhombusNode"
 import { CommonNode } from "./CommonNode"
+import SubGraphNode from "./SubGraphNode"
 
 export const initialNodes = [
     {
@@ -38,4 +39,5 @@ export const nodeTypes = {
     "stadium-shaped": StadiumShapedNode,
     circle: CircleNode,
     rhombus: RhombusNode,
+    subgraph: SubGraphNode
 } satisfies NodeTypes

@@ -36,7 +36,7 @@ const createGraph = (nodes, edges, subGraphs, options) => {
 
     const createSubGraph = (parentNode, allNodes, allEdges) => {
         const children = allNodes.filter(node => node.parentNode === parentNode.id);
-        const subGraphs = allNodes.filter(node => node.type === 'subgraph' && node.parentNode === parentNode.id);
+        const nestedSubGraphs = subGraphs.filter(subGraph => subGraph.parentNode === parentNode.id);
 
         return {
             id: parentNode.id,
@@ -48,7 +48,7 @@ const createGraph = (nodes, edges, subGraphs, options) => {
                 width: 150,
                 height: 50,
                 ...createSubGraph(node, allNodes, allEdges)  // Recurse into subgraphs
-            })),
+            })).concat(nestedSubGraphs.map(subGraph => createSubGraph(subGraph, allNodes, allEdges))),
             edges: allEdges.filter(edge => edge.source === parentNode.id || edge.target === parentNode.id)
         };
     };
@@ -71,18 +71,17 @@ const createGraph = (nodes, edges, subGraphs, options) => {
     };
 };
 
-const getLayoutedElements = async (nodes: Node<any>[], edges: Edge<any>[], subGraphs: Node<any>[], options: any) => {
+const getLayoutedElements = async (nodes, edges, subGraphs, options) => {
     const graph = createGraph(nodes, edges, subGraphs, options);
 
     try {
         const layoutedGraph = await elk.layout(graph);
-        const layoutedNodes = layoutedGraph.children.map((node) => ({
+        const layoutedNodes = layoutedGraph.children.map(node => ({
             ...node,
             position: { x: node.x, y: node.y },
+            width: node.width,
+            height: node.height,
         }));
-
-        // console.log("layoutedGraph", layoutedGraph);
-        // console.log("layoutedNodes", layoutedNodes);
 
         return {
             nodes: layoutedNodes,
@@ -94,6 +93,7 @@ const getLayoutedElements = async (nodes: Node<any>[], edges: Edge<any>[], subGr
         return { nodes, edges, subGraphs };
     }
 };
+
 
 const DiagramPage = () => {
     useRemoveLogo();
@@ -111,7 +111,15 @@ const DiagramPage = () => {
     const setDiagram = async (nodes, edges, subGraphs) => {
         const layouted = await getLayoutedElements(nodes, edges, subGraphs, { "elk.direction": "DOWN" });
 
-        setNodes([...layouted.nodes, ...layouted.subGraphs]); // Include subGraphs in nodes if necessary
+        // Include subGraphs as nodes with type 'subgraph'
+        const subGraphNodes = layouted.subGraphs.map(subGraph => ({
+            id: subGraph.id,
+            type: 'subgraph',
+            data: { label: subGraph.id, width: subGraph.width, height: subGraph.height },
+            position: { x: subGraph.x, y: subGraph.y }
+        }));
+
+        setNodes([...layouted.nodes, ...subGraphNodes]);
         setEdges([...layouted.edges]);
 
         window.requestAnimationFrame(() => {
@@ -124,7 +132,7 @@ const DiagramPage = () => {
     useEffect(() => {
         const interval = setInterval(async () => {
             if (!diagramManager.needRerender) {
-                await setDiagram(diagramManager.nodes, diagramManager.edges, diagramManager.subGraphs); // Pass subGraphs
+                // await setDiagram(diagramManager.nodes, diagramManager.edges, diagramManager.subGraphs); // Pass subGraphs
                 if (!diagramManager.isGenerating) {
                     return;
                 }
