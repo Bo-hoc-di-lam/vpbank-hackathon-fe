@@ -76,12 +76,26 @@ const getLayoutedElements = async (nodes, edges, subGraphs, options) => {
 
     try {
         const layoutedGraph = await elk.layout(graph);
-        const layoutedNodes = layoutedGraph.children.map(node => ({
+        subGraphs = layoutedGraph.children.map(subGraph => ({
+            ...subGraph,
+            position: { x: subGraph.x, y: subGraph.y },
+            width: subGraph.width,
+            height: subGraph.height,
+            style: { width: subGraph.width, height: subGraph.height}
+        }));
+
+        const layoutedNodes = subGraphs.map(subGraph => {
+            return subGraph.children
+        }).flat().map(
+            node => ({
             ...node,
             position: { x: node.x, y: node.y },
             width: node.width,
             height: node.height,
         }));
+
+        console.log(layoutedNodes);
+
 
         return {
             nodes: layoutedNodes,
@@ -111,15 +125,7 @@ const DiagramPage = () => {
     const setDiagram = async (nodes, edges, subGraphs) => {
         const layouted = await getLayoutedElements(nodes, edges, subGraphs, { "elk.direction": "DOWN" });
 
-        // Include subGraphs as nodes with type 'subgraph'
-        const subGraphNodes = layouted.subGraphs.map(subGraph => ({
-            id: subGraph.id,
-            type: 'subgraph',
-            data: { label: subGraph.id, width: subGraph.width, height: subGraph.height },
-            position: { x: subGraph.x, y: subGraph.y }
-        }));
-
-        setNodes([...layouted.nodes, ...subGraphNodes]);
+        setNodes([...layouted.nodes, ...layouted.subGraphs]);
         setEdges([...layouted.edges]);
 
         window.requestAnimationFrame(() => {
@@ -132,7 +138,7 @@ const DiagramPage = () => {
     useEffect(() => {
         const interval = setInterval(async () => {
             if (!diagramManager.needRerender) {
-                // await setDiagram(diagramManager.nodes, diagramManager.edges, diagramManager.subGraphs); // Pass subGraphs
+                await setDiagram(diagramManager.nodes, diagramManager.edges, diagramManager.subGraphs); // Pass subGraphs
                 if (!diagramManager.isGenerating) {
                     return;
                 }
