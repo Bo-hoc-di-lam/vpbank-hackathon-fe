@@ -34,15 +34,13 @@ const router = createBrowserRouter([
 ])
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-    <React.StrictMode>
-        <QueryClientProvider client={queryClient}>
-            <MantineProvider>
-                <ModalsProvider>
-                    <ReactFlowProvider>
-                        <RouterProvider router={router} />
-                    </ReactFlowProvider>
-                </ModalsProvider>
-            </MantineProvider>
-        </QueryClientProvider>
-    </React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+        <MantineProvider>
+            <ModalsProvider>
+                <ReactFlowProvider>
+                    <RouterProvider router={router} />
+                </ReactFlowProvider>
+            </ModalsProvider>
+        </MantineProvider>
+    </QueryClientProvider>
 )

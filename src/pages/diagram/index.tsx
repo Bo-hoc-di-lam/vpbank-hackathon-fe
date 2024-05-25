@@ -1,5 +1,5 @@
 import Dagre from "@dagrejs/dagre"
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useState } from "react"
 import ReactFlow, {
     addEdge,
     Background,
@@ -30,8 +30,11 @@ const directionRecords: Record<string, string> = {
     LR: "Left to Right",
 }
 
-const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}))
 const ws = new WSClient();
+const nodes_clone: Node<any>[] = [];
+const edges_clone: Edge<any>[] = [];
+
+const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}))
 
 const getLayoutedElements = (nodes: any, edges: any, options: any) => {
     g.setGraph({ rankdir: options.direction })
@@ -51,9 +54,6 @@ const getLayoutedElements = (nodes: any, edges: any, options: any) => {
     }
 }
 
-const nodes_clone: Node<any>[] = [];
-const edges_clone: Edge<any>[] = [];
-
 const DiagramPage = () => {
     useRemoveLogo()
 
@@ -70,13 +70,14 @@ const DiagramPage = () => {
     const { fitView } = useReactFlow()
     const [nodes, setNodes, onNodesChange] = useNodesState([])
     const [edges, setEdges, onEdgesChange] = useEdgesState([])
+
     const onConnect: OnConnect = useCallback(
         (connection) => setEdges((edges) => addEdge(connection, edges)),
         [setEdges]
     )
 
     const onLayout = useCallback(() => {
-        const layouted = getLayoutedElements(nodes, edges, { direction })
+        const layouted = getLayoutedElements(nodes_clone, edges_clone, { direction })
 
         setNodes([...layouted.nodes])
         setEdges([...layouted.edges])
@@ -94,37 +95,56 @@ const DiagramPage = () => {
         if (!query) return;
 
         ws.sendPrompt(query);
-    }, [location])
-
-    ws.on(WSEvent.AddNode, (data : any) => {
-        nodes.push({
-            id: data.id,
-            type: 'common',
-            data: {
-                label: data.text,
-            },
-            position: data.position,
+        ws.on(WSEvent.AddNode, (data : any) => {
+            nodes_clone.push({
+                id: data.id,
+                type: 'common',
+                data: {
+                    label: data.text,
+                },
+                style: {
+                    width: 100,
+                    height: 100,
+                },
+                position: data.position,
+            });
         });
-        onLayout();
-    });
-
-    ws.on(WSEvent.AddLink, (data: any) => {
-        edges.push({
-            id: data.id,
-            source: data.from_id,
-            target: data.to_id,
-            ariaLabel: data.text,
+    
+        ws.on(WSEvent.AddLink, (data: any) => {
+            edges_clone.push({
+                id: data.id,
+                source: data.from_id,
+                target: data.to_id,
+                ariaLabel: data.text,
+            });
         });
-        onLayout();
-    });
+    
+        ws.on(WSEvent.Done, () => {
+            console.log("nodes", nodes_clone)
+            console.log("edges", edges_clone)
+            
+            setNodes(nodes_clone);
+            setEdges(edges_clone);
+            // onLayout();
+        })
+    
+        ws.on(WSEvent.SetNodePosition, (data: any) => {
+            const node = nodes_clone.find(n => n.id === data.id);
+            if (node) {
+                node.position = data.position;
+                // setNodes(nodes_clone);
+            }
+        });
+        // Create interval to update chart every 1 second
+        // const interval = setInterval(() => {
+        //     console.log("isGenerating", isGenerating)
+        //     if (isGenerating) return;
+        //     console.log("onLayout")
+        //     onLayout();
+        // }, TIME);
 
-    ws.on(WSEvent.SetNodePosition, (data: any) => {
-        const node = nodes.find(n => n.id === data.id);
-        if (node) {
-            node.position = data.position;
-            onLayout();
-        }
-    });
+        // return () => clearInterval(interval);
+    }, [])
 
 
     return (
