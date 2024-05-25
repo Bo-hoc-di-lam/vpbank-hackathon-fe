@@ -4,8 +4,6 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import toast from 'react-hot-toast';
 
-
-
 const ViewMermaid = () => {
     const diagramManager = useDiagramManager();
     const [codeString, setCodeString] = useState<string>(diagramManager.mermaid);

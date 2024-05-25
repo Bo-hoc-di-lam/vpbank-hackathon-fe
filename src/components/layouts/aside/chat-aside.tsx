@@ -10,6 +10,7 @@ import {
 import { IconSend } from "@tabler/icons-react"
 import { useEffect, useRef, useState } from "react"
 import ReactMarkdown from 'react-markdown'
+import toast from 'react-hot-toast';
 
 interface Message {
     role: string
@@ -35,6 +36,14 @@ const ChatAside = () => {
     const diagramManager = useDiagramManager()
 
     const handleChat = (prompt: string) => {
+        if (prompt === "") {
+            toast.error('Please enter a message');
+            return;
+        }
+
+        // show toast loading
+        toast.loading('Getting diagram...');
+
         diagramManager.start(prompt);
         setChat("");
         setMessaging(true);
@@ -64,12 +73,16 @@ const ChatAside = () => {
         })
 
         diagramManager.onDone(() => {
+            // hide toast loading
+            toast.dismiss();
             setMessaging(false);
             setConversation((prevConversation) => [
                 ...prevConversation,
                 { role: "bot", message: "Done" },
             ]);
             scrollBottom();
+
+            toast.success('Diagram generated');
         })
     }, [])
 
