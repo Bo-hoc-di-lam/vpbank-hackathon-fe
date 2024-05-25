@@ -86,7 +86,7 @@ const DiagramPage = () => {
             fitView()
         })
         toggleDirection()
-    }, [nodes, edges])
+    }, [nodes_clone, edges_clone])
     
     // Handle input and render chart
     const location = useLocation();
@@ -123,9 +123,9 @@ const DiagramPage = () => {
             console.log("nodes", nodes_clone)
             console.log("edges", edges_clone)
             
-            setNodes(nodes_clone);
-            setEdges(edges_clone);
-            // onLayout();
+            // setNodes(nodes_clone);
+            // setEdges(edges_clone);
+            onLayout();
         })
     
         ws.on(WSEvent.SetNodePosition, (data: any) => {
