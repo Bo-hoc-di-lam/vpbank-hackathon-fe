@@ -59,16 +59,33 @@ const getLayoutedElements = (nodes: any, edges: any, subGraphs: any, options: an
         const minY = Math.min(...yPositions)
         const maxY = Math.max(...yPositions)
 
+        // to draw a node x, width -> render at x - width
+        // each component is 100 x 50
+        // -> middle of each component is x + 50, y + 25
         const midX = (minX + maxX) / 2
         const midY = (minY + maxY) / 2
 
-        subGraph.position = { x: midX, y: midY }
-        subGraph.style = { width: maxX - minX, height: maxY - minY}
+        const block_width = 120
+        const block_height = 80
+        const width = maxX - minX + block_width
+        const height = maxY - minY + block_height
+
+        const subGraphX = midX - width / 2 + block_width / 4 + 20
+        const subGraphY = midY - height / 2 + block_height / 4 + 0
+
+        // subtract all children's positions
+        childNodes.forEach((node: any) => {
+            node.position.x -= subGraphX
+            node.position.y -= subGraphY
+        })
+
+        subGraph.position = { x: subGraphX, y: subGraphY }
+        subGraph.style = { width: width, height: height }
     })
 
     subGraphs = subGraphs.filter((subGraph: any) => subGraph.position)
 
-    console.log("subGraphs", subGraphs)
+    // console.log("subGraphs", subGraphs)
 
     return {
         nodes,
@@ -106,6 +123,7 @@ const DiagramPage = () => {
     useEffect(() => {
         const interval = setInterval(() => {
             if (!diagramManager.needRerender) {
+                // setDiagram(diagramManager.nodes, diagramManager.edges, diagramManager.subGraphs) // Pass subGraphs
                 if (!diagramManager.isGenerating) {
                     return
                 }
@@ -119,7 +137,11 @@ const DiagramPage = () => {
             diagramManager.needRerender = false;
         }, 500);
 
-        return () => clearInterval(interval);
+        return () => { 
+            console.log('rendering final...')
+            setDiagram(diagramManager.nodes, diagramManager.edges, diagramManager.subGraphs) // Pass subGraphs
+            clearInterval(interval);
+        }
     }, [])
 
     // useEffect(() => {
