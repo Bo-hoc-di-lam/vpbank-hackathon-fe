@@ -4,12 +4,14 @@ import {
     AppShell,
     Group,
     ScrollArea,
-    Skeleton,
     Textarea,
+    Loader,
 } from "@mantine/core"
-import { useCounter, useListState } from "@mantine/hooks"
 import { IconSend } from "@tabler/icons-react"
 import { useEffect, useRef, useState } from "react"
+import ReactMarkdown from 'react-markdown'
+import toast from 'react-hot-toast';
+import { useReactFlow } from "reactflow"
 
 interface Message {
     role: string
@@ -17,13 +19,12 @@ interface Message {
 }
 
 const ChatAside = () => {
-    const [conversation, handlers] = useListState<Message>([])
+    const [conversation, setConversation] = useState<Message[]>([])
     const [chat, setChat] = useState<string>("")
     const [messaging, setMessaging] = useState<boolean>(false)
-    const [botChatIndex, setBotChatIndex] = useState<number>(0)
-    const [count, coundHandlers] = useCounter(0, { min: 0 })
 
     const chatSectionViewport = useRef<HTMLDivElement>(null)
+    const reactFlow = useReactFlow()
 
     const scrollBottom = () => {
         setTimeout(() => {
@@ -37,48 +38,55 @@ const ChatAside = () => {
     const diagramManager = useDiagramManager()
 
     const handleChat = (prompt: string) => {
-        diagramManager.start(prompt)
-        setChat("")
-        setMessaging(true)
-        handlers.append({ role: "user", message: prompt })
-        scrollBottom()
-        handlers.append({ role: "bot", message: "l" })
-        setBotChatIndex(conversation.length + 1)
-        console.log(conversation)
+        if (prompt === "") {
+            toast.error('Please enter a message');
+            return;
+        }
 
-        scrollBottom()
-    }
+        // show toast loading
+        toast.loading('Generating diagram...');
+
+        diagramManager.start(prompt);
+        setChat("");
+        setMessaging(true);
+
+        setConversation((prevConversation) => [
+            ...prevConversation,
+            { role: "user", message: prompt },
+            { role: "bot", message: "l" },
+        ]);
+
+        scrollBottom();
+    };
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            if (diagramManager.needRerender) {
-                if (diagramManager.isGenerating) {
-                    setMessaging(true)
-                    coundHandlers.increment()
-                    if (diagramManager.comment !== "") {
-                        handlers.setItem(botChatIndex, {
-                            role: "bot",
-                            message: diagramManager.comment,
-                        })
-                        diagramManager.comment = ""
-                    }
-                } else {
-                    if (count > 0) {
-                        handlers.append({
-                            role: "bot",
-                            message: "Done",
-                        })
-                    }
-                    setMessaging(false)
-                    scrollBottom()
-                    clearInterval(interval)
-                    diagramManager.needRerender = false
-                }
+        diagramManager.onCommentChange((comment) => {
+            if (comment !== "") {
+                setConversation((prevConversation) => {
+                    const newConversation = [...prevConversation];
+                    newConversation[newConversation.length - 1] = {
+                        role: "bot",
+                        message: comment,
+                    };
+                    return newConversation;
+                });
+                scrollBottom();
             }
-        }, 1000)
+        })
 
-        return () => clearInterval(interval)
-    }, [handleChat])
+        diagramManager.onDone(() => {
+            // hide toast loading
+            toast.dismiss();
+            setMessaging(false);
+            setConversation((prevConversation) => [
+                ...prevConversation,
+                { role: "bot", message: "Done" },
+            ]);
+            scrollBottom();
+            reactFlow.fitView();
+            toast.success('Diagram generated');
+        })
+    }, [])
 
     return (
         <>
@@ -112,7 +120,7 @@ const ChatAside = () => {
                         onClick={() => handleChat(chat)}
                         disabled={messaging}
                     >
-                        <IconSend size={20} />
+                        {messaging ? <Loader size="sm" /> : <IconSend size={20} />}
                     </ActionIcon>
                 </Group>
             </AppShell.Section>
@@ -132,12 +140,19 @@ const ChatUi = ({ role, message }: Message) => {
                         />
                     </div>
                 </div>
-                <div className="chat-header">Obi-Wan Kenobi</div>
+                <div className="chat-header">Chatbot</div>
                 <div className="chat-bubble chat-bubble-info flex items-center">
                     {message === "l" ? (
-                        <Skeleton height={20} width={70} radius="sm" />
+                        // Add loading dots animation here using tailwindcss
+                        <div className="flex space-x-1">
+                            <div className="h-2 w-2 bg-gray-600 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                            <div className="h-2 w-2 bg-gray-600 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                            <div className="h-2 w-2 bg-gray-600 rounded-full animate-bounce delay-300"></div>
+                        </div>
                     ) : (
-                        message
+                        <span>
+                            <ReactMarkdown>{message}</ReactMarkdown>
+                        </span>
                     )}
                 </div>
             </div>

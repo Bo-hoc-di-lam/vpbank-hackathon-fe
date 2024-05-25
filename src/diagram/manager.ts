@@ -9,6 +9,11 @@ export class DiagramManager {
     public isGenerating: boolean = false
     public needRerender: boolean = false
     public comment: string = ""
+	public mermaid: string = ""
+	private onCommentChangeHandlers: ((comment: string) => void)[] = []
+	private onDoneHandlers: (() => void)[] = []
+	private onMermaidHandlers: ((mermaid: string) => void)[] = []
+	
 
     private ws: WSClient
 
@@ -40,9 +45,23 @@ export class DiagramManager {
             });
         });
     
-        this.ws.on(WSEvent.SetComment, (data: any) => {
-            this.needRerender = true
+        // this.ws.on(WSEvent.SetNodePosition, (data: any) => {
+		// 	this.needRerender = true;
+		// 	this.isNeedGenLayout = false;
+        //     const node = this.nodes.find(n => n.id === data.id);
+        //     if (node) {
+        //         node.position = data.position;
+        //     }
+        // });
+
+		this.ws.on(WSEvent.SetComment, (data: any) => {
             this.comment = data
+
+			if (this.onCommentChangeHandlers) {
+				this.onCommentChangeHandlers.forEach(handler => {
+					handler(data)
+				})
+			}
         });
 
         this.ws.on(WSEvent.AddSubGraph, (data: any) => {
@@ -56,14 +75,43 @@ export class DiagramManager {
                 position: data.position,
             });
         });
+
 		this.ws.on(WSEvent.Done, () => {
 			// this.needRerender = true;
 			this.isGenerating = false;
+
+			if (this.onDoneHandlers) {
+				this.onDoneHandlers.forEach(handler => {
+					handler()
+				})
+			}
 		});
+
+		this.ws.on(WSEvent.Mermaid, (data: any) => {
+			this.mermaid = data
+
+			if (this.onMermaidHandlers) {
+				this.onMermaidHandlers.forEach(handler => {
+					handler(data)
+				})
+			}
+		})	
 	}
 
     public start(query: string) {
         this.isGenerating = true
         this.ws.sendPrompt(query)
     }
+
+	public onCommentChange(handler: (comment: string) => void) {
+		this.onCommentChangeHandlers.push(handler)
+	}
+
+	public onDone(handler: () => void) {
+		this.onDoneHandlers.push(handler)
+	}
+
+	public onMermaid(handler: (mermaid: string) => void) {
+		this.onMermaidHandlers.push(handler)
+	}
 }
