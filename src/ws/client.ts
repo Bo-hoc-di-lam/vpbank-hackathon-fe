@@ -60,7 +60,6 @@ export class WSClient {
     private roomNameplate: string = ''
 
     private ws: WebSocket
-    private queue: Message<any>[] = []
 
     private eventHandler: MPEvent = {}
     private staticHandler: MPEvent = {
