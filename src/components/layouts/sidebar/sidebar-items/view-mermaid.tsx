@@ -3,6 +3,9 @@ import { useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import toast from 'react-hot-toast';
+import { Button } from "@mantine/core";
+
+import { exportToMermaidFile } from '@/utils/file';
 
 const ViewMermaid = () => {
     const diagramManager = useDiagramManager();
@@ -25,18 +28,36 @@ const ViewMermaid = () => {
         });
     };
 
+    const exportToFile = () => {
+        if (!codeString) {
+            toast.error('No code to export');
+            return;
+        }
+
+        exportToMermaidFile(codeString);
+        toast.success('File exported successfully');
+    };
+
     return (
         <div className="flex flex-col gap-4">
             <SyntaxHighlighter language="plaintext" style={dracula} wrapLines={true}
                 lineProps={{ style: { wordBreak: 'break-all', whiteSpace: 'pre-wrap' } }}>
                 {codeString}
             </SyntaxHighlighter>
-            <button
+            <Button
+                fullWidth
+                variant="light"
                 onClick={copyToClipboard}
-                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
             >
                 Copy to Clipboard
-            </button>
+            </Button>
+            <Button
+                fullWidth
+                variant="light"
+                onClick={exportToFile}
+            >
+                Export to File
+            </Button>
         </div>
     );
 };
