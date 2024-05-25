@@ -24,24 +24,56 @@ import {
 
 const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}))
 
-const getLayoutedElements = (nodes: any, edges: any, options: any) => {
+const getLayoutedElements = (nodes: any, edges: any, subGraphs: any, options: any) => {
     g.setGraph({ rankdir: options.direction })
 
     edges.forEach((edge: any) => g.setEdge(edge.source, edge.target))
     nodes.forEach((node: any) => g.setNode(node.id, node))
 
-    Dagre.layout(g)
+    try {
+        Dagre.layout(g)
+    } catch (error) {
+        console.error(error)
+        console.log("subGraphs", subGraphs)
+        console.log("nodes", nodes)
+        console.log("edges", edges)
+        console.log("g", g)
+    }
+
+    // map positions
+    nodes = nodes.map((node: any) => {
+        const { x, y } = g.node(node.id)
+        return { ...node, position: { x: x * 3, y: y * 2 } }
+    }) 
+
+    // Calculate subGraph positions and sizes
+    subGraphs.forEach((subGraph: any) => {
+        const childNodes = nodes.filter((node: any) => node.parentNode === subGraph.id)
+        if (childNodes.length === 0) return
+        
+        const xPositions = childNodes.map((node: any) => node.position.x)
+        const yPositions = childNodes.map((node: any) => node.position.y)
+
+        const minX = Math.min(...xPositions)
+        const maxX = Math.max(...xPositions)
+        const minY = Math.min(...yPositions)
+        const maxY = Math.max(...yPositions)
+
+        const midX = (minX + maxX) / 2
+        const midY = (minY + maxY) / 2
+
+        subGraph.position = { x: midX, y: midY }
+        subGraph.style = { width: maxX - minX, height: maxY - minY}
+    })
+
+    subGraphs = subGraphs.filter((subGraph: any) => subGraph.position)
+
+    console.log("subGraphs", subGraphs)
 
     return {
-        nodes: nodes.map((node: any) => {
-            const { x, y } = g.node(node.id)
-
-            return { ...node, position: { 
-                x: x * 3,
-                y: y * 2
-            } }
-        }),
+        nodes,
         edges,
+        subGraphs
     }
 }
 
@@ -58,21 +90,19 @@ const DiagramPage = () => {
         [setEdges]
     )
 
-    const setDiagram = (nodes: any, edges: any) => {
-        const layouted = getLayoutedElements(nodes, edges, { direction: 'TD' })
+ const setDiagram = (nodes: any, edges: any, subGraphs: any) => {
+        const layouted = getLayoutedElements(nodes, edges, subGraphs, { direction: 'TD' })
 
-        setNodes([...layouted.nodes])
+        setNodes([...layouted.nodes, ...layouted.subGraphs]) // Include subGraphs in nodes
         setEdges([...layouted.edges])
 
         window.requestAnimationFrame(() => {
             fitView()
         })
-        // toggleDirection()
     }
 
     const diagramManager = useDiagramManager()
 
-    // Handle input and render chart
     useEffect(() => {
         const interval = setInterval(() => {
             if (!diagramManager.needRerender) {
@@ -84,7 +114,7 @@ const DiagramPage = () => {
             }
 
             console.log('rendering...')
-            setDiagram(diagramManager.nodes, diagramManager.edges)
+            setDiagram(diagramManager.nodes, diagramManager.edges, diagramManager.subGraphs) // Pass subGraphs
 
             diagramManager.needRerender = false;
         }, 500);
@@ -126,13 +156,6 @@ const DiagramPage = () => {
                 type: "straight",
             }}
         >
-            {/* <Panel position="top-left">
-                <Tooltip label={directionRecords[direction]} position="right">
-                    <ActionIcon onClick={onLayout}>
-                        <IconLayout />
-                    </ActionIcon>
-                </Tooltip>
-            </Panel> */}
             <Background />
             <Controls />
         </ReactFlow>

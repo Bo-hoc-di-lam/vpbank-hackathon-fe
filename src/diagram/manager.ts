@@ -5,6 +5,7 @@ import { Node, Edge } from "reactflow"
 export class DiagramManager {
     public nodes: Node<any>[] = []
     public edges: Edge<any>[] = []
+    public subGraphs: Node<any>[] = [] // Add this line
     public isGenerating: boolean = false
     public needRerender: boolean = false
     public comment: string = ""
@@ -34,37 +35,24 @@ export class DiagramManager {
                 source: data.from_id,
                 target: data.to_id,
                 data: {
-					label: data.text,
-				}
+                    label: data.text,
+                }
             });
         });
     
-        // this.ws.on(WSEvent.SetNodePosition, (data: any) => {
-		// 	this.needRerender = true;
-		// 	this.isNeedGenLayout = false;
-        //     const node = this.nodes.find(n => n.id === data.id);
-        //     if (node) {
-        //         node.position = data.position;
-        //     }
-        // });
-
-		this.ws.on(WSEvent.SetComment, (data: any) => {
+        this.ws.on(WSEvent.SetComment, (data: any) => {
             this.needRerender = true
             this.comment = data
         });
 
         this.ws.on(WSEvent.AddSubGraph, (data: any) => {
             this.needRerender = true;
-            this.nodes.push({
+            this.subGraphs.push({ // Change from nodes to subGraphs
                 id: data.id,
                 type: 'group',
                 data: {
                     label: data.text,
                 },
-                // style: {
-                //     width: 400,
-                //     height: 300,
-                // },
                 position: data.position,
             });
         });
