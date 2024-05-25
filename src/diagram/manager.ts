@@ -85,6 +85,10 @@ export class DiagramManager {
                 clearInterval(this.interval)
             }
 
+            if(this.renderFunc) {
+                this.renderFunc()
+            }
+
 			if (this.onDoneHandlers) {
 				this.onDoneHandlers.forEach(handler => {
 					handler()

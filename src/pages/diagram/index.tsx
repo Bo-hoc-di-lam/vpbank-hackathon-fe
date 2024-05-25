@@ -72,34 +72,53 @@ const createGraph = (nodes, edges, subGraphs, options) => {
     };
 };
 
+const basicNodeInfo = (info: any): any => {
+    const node = {
+        id: info.id,
+        data: {
+            label: info.data?.label || info.id,
+        },
+        parentNode: info.parentNode,
+        position: {
+            x: info.x,
+            y: info.y,
+        },
+        type: 'common',
+    };
+
+    return node;
+}
+
+const processsubGraph = (subGraph: any): any => {
+    let output = [];
+
+    const node = basicNodeInfo(subGraph);
+    if (subGraph.children.length > 0) {
+        subGraph.children.forEach(child => {
+            output = output.concat(processsubGraph(child));
+        });
+
+        node.type = 'group';
+        node.style = {
+            width: subGraph.width,
+            height: subGraph.height,
+        }
+
+    }
+
+    output.push(node);
+    return output;
+};
+
 const getLayoutedElements = async (nodes, edges, subGraphs, options) => {
     const graph = createGraph(nodes, edges, subGraphs, options);
 
     try {
         const layoutedGraph = await elk.layout(graph);
-        subGraphs = layoutedGraph.children.map(subGraph => ({
-            ...subGraph,
-            position: { x: subGraph.x, y: subGraph.y },
-            width: subGraph.width,
-            height: subGraph.height,
-            style: { width: subGraph.width, height: subGraph.height}
-        }));
-
-        const layoutedNodes = subGraphs.map(subGraph => {
-            return subGraph.children
-        }).flat().map(
-            node => ({
-            ...node,
-            position: { x: node.x, y: node.y },
-            width: node.width,
-            height: node.height,
-        }));
-
-        console.log(layoutedNodes);
-
+        const nodes = layoutedGraph.children.map(processsubGraph).flat()
 
         return {
-            nodes: layoutedNodes,
+            nodes,
             edges: layoutedGraph.edges,
             subGraphs, // handle subGraphs here if needed
         };
@@ -126,7 +145,7 @@ const DiagramPage = () => {
     const setDiagram = async (nodes, edges, subGraphs) => {
         const layouted = await getLayoutedElements(nodes, edges, subGraphs, { "elk.direction": "DOWN" });
 
-        setNodes([...layouted.nodes, ...layouted.subGraphs]);
+        setNodes([...layouted.nodes]);
         setEdges([...layouted.edges]);
 
         window.requestAnimationFrame(() => {
@@ -149,8 +168,7 @@ const DiagramPage = () => {
         }, 500);
 
         return () => {
-            // console.log("rendering final...");
-            // setDiagram(diagramManager.nodes, diagramManager.edges, diagramManager.subGraphs); // Pass subGraphs
+            setDiagram(diagramManager.nodes, diagramManager.edges, diagramManager.subGraphs); // Pass subGraphs
 
             if (diagramManager.interval) {
                 clearInterval(diagramManager.interval);
