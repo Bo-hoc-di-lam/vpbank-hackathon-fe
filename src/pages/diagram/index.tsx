@@ -25,7 +25,11 @@ import {
 const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}))
 
 const getLayoutedElements = (nodes: any, edges: any, subGraphs: any, options: any) => {
-    g.setGraph({ rankdir: options.direction })
+    g.setGraph({
+        rankdir: options.direction, 
+        width: 100,
+        height: 50
+    })
 
     edges.forEach((edge: any) => g.setEdge(edge.source, edge.target))
     nodes.forEach((node: any) => g.setNode(node.id, node))
