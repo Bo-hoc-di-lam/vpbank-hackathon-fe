@@ -60,6 +60,7 @@ export class WSClient {
     private roomNameplate: string = ''
 
     private ws: WebSocket
+    private queue: Message<any>[] = []
 
     private eventHandler: MPEvent = {}
     private staticHandler: MPEvent = {
@@ -138,6 +139,8 @@ export class WSClient {
     private handleEvent(msg: MessageEvent<any>) {
         const data = msg.data
         const event: Message<any> = JSON.parse(data)
+
+        console.log(event)
         this.staticHandler[event.event as WSEvent]?.(event.data)
         this.eventHandler[event.event as WSEvent]?.(event.data)
     }

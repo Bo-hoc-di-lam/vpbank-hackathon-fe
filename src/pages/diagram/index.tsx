@@ -4,11 +4,13 @@ import ReactFlow, {
     addEdge,
     Background,
     Controls,
+    Node,
     OnConnect,
     Panel,
     useEdgesState,
     useNodesState,
     useReactFlow,
+    Edge,
 } from "reactflow"
 import { useLocation } from 'react-router-dom';
 
@@ -48,6 +50,10 @@ const getLayoutedElements = (nodes: any, edges: any, options: any) => {
         edges,
     }
 }
+
+const nodes_clone: Node<any>[] = [];
+const edges_clone: Edge<any>[] = [];
+
 const DiagramPage = () => {
     useRemoveLogo()
 
@@ -86,26 +92,39 @@ const DiagramPage = () => {
     useEffect(() => {
         const query = location.state?.query || '';
         if (!query) return;
+
         ws.sendPrompt(query);
     }, [location])
 
     ws.on(WSEvent.AddNode, (data : any) => {
-        const newNode = {
+        nodes.push({
             id: data.id,
             type: 'common',
             data: {
                 label: data.text,
             },
             position: data.position,
-        }
-
-        const newNodes = [...nodes, newNode]
-        setNodes(newNodes)
+        });
+        onLayout();
     });
 
-    // ws.on(WSEvent.AddSubGraph, (data) => {
-    //     console.log(data);
-    // });
+    ws.on(WSEvent.AddLink, (data: any) => {
+        edges.push({
+            id: data.id,
+            source: data.from_id,
+            target: data.to_id,
+            ariaLabel: data.text,
+        });
+        onLayout();
+    });
+
+    ws.on(WSEvent.SetNodePosition, (data: any) => {
+        const node = nodes.find(n => n.id === data.id);
+        if (node) {
+            node.position = data.position;
+            onLayout();
+        }
+    });
 
 
     return (
