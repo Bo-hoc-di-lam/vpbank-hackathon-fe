@@ -1,13 +1,26 @@
 
 import { Link, SubGraph, Vertex } from '@/type/diagram'
-import { Message, WSEvent, Prompt, MessageData, EditNode } from '@/type/ws_data'
+import { Message, WSEvent, Prompt, MessageData, EditNode, GenerateIcon, IconType } from '@/type/ws_data'
 
 type MessageCallback<T extends MessageData> = (msg: Message<T>) => void
 
 interface WSEventMap {
+    // info
     [WSEvent.Error]: MessageCallback<string>
+    [WSEvent.UserJoined]: MessageCallback<string>
+    [WSEvent.UserLeave]: MessageCallback<string>
+    [WSEvent.Lock]: MessageCallback<any>
+    [WSEvent.Done]: MessageCallback<any>
+    [WSEvent.Mermaid]: MessageCallback<string>
+    [WSEvent.RoomInfo]: MessageCallback<string>
+
+    // user action
     [WSEvent.Prompt]: MessageCallback<Prompt>
     [WSEvent.PromptEdit]: MessageCallback<Prompt>
+    [WSEvent.GenerateIcon]: MessageCallback<GenerateIcon>
+    [WSEvent.JoinRoom]: MessageCallback<string>
+
+    // server diagram response
     [WSEvent.AddNode]: MessageCallback<Vertex>
     [WSEvent.AddLink]: MessageCallback<Link>
     [WSEvent.AddSubGraph]: MessageCallback<SubGraph>
@@ -18,9 +31,21 @@ interface WSEventMap {
     [WSEvent.DelLink]: MessageCallback<Link>
     [WSEvent.DelSubGraph]: MessageCallback<SubGraph>
     [WSEvent.SetNodePosition]: MessageCallback<Vertex>
-    [WSEvent.JoinRoom]: MessageCallback<string>
-    [WSEvent.RoomInfo]: MessageCallback<string>
     [WSEvent.SetComment]: MessageCallback<string>
+
+    // server diagram with custom icon response
+    [WSEvent.AddNodeAWS]: MessageCallback<Vertex>
+    [WSEvent.AddLinkAWS]: MessageCallback<Link>
+    [WSEvent.AddSubGraphAWS]: MessageCallback<SubGraph>
+    [WSEvent.ChangeNodeAWS]: MessageCallback<Vertex>
+    [WSEvent.ChangeLinkAWS]: MessageCallback<Link>
+    [WSEvent.ChangeSubGraphAWS]: MessageCallback<SubGraph>
+    [WSEvent.DelNodeAWS]: MessageCallback<Vertex>
+    [WSEvent.DelLinkAWS]: MessageCallback<Link>
+    [WSEvent.DelSubGraphAWS]: MessageCallback<SubGraph>
+    [WSEvent.SetNodePositionAWS]: MessageCallback<Vertex>
+    [WSEvent.SetCommentAWS]: MessageCallback<string>
+
     [key: string]: MessageCallback<any>
 }
 
@@ -70,6 +95,17 @@ export class WSClient {
         }
         this.ws.send(JSON.stringify(data))
     }
+
+    public GenerateIcon(iconType: IconType) {
+        const data: Message<GenerateIcon> = {
+            event: WSEvent.GenerateIcon,
+            data: {
+                type: iconType
+            }
+        }
+        this.ws.send(JSON.stringify(data))
+    }
+
 
     public SendPrompt(prompt: string) {
         const data: Message<Prompt> = {
