@@ -8,7 +8,9 @@ export class DiagramManager {
     public isGenerating: boolean = false
     public needRerender: boolean = false
     public comment: string = ""
-	public onCommentChangeHandlers: ((comment: string) => void)[] = []
+	private onCommentChangeHandlers: ((comment: string) => void)[] = []
+	private onDoneHandlers: (() => void)[] = []
+	
 
     private ws: WSClient
 
@@ -77,6 +79,12 @@ export class DiagramManager {
 		this.ws.on(WSEvent.Done, () => {
 			// this.needRerender = true;
 			this.isGenerating = false;
+
+			if (this.onDoneHandlers) {
+				this.onDoneHandlers.forEach(handler => {
+					handler()
+				})
+			}
 		});
 		
 	}
@@ -88,5 +96,9 @@ export class DiagramManager {
 
 	public onCommentChange(handler: (comment: string) => void) {
 		this.onCommentChangeHandlers.push(handler)
+	}
+
+	public onDone(handler: () => void) {
+		this.onDoneHandlers.push(handler)
 	}
 }

@@ -5,6 +5,7 @@ import {
     Group,
     ScrollArea,
     Textarea,
+    Loader,
 } from "@mantine/core"
 import { IconSend } from "@tabler/icons-react"
 import { useEffect, useRef, useState } from "react"
@@ -60,6 +61,15 @@ const ChatAside = () => {
                 });
                 scrollBottom();
             }
+        })
+
+        diagramManager.onDone(() => {
+            setMessaging(false);
+            setConversation((prevConversation) => [
+                ...prevConversation,
+                { role: "bot", message: "Done" },
+            ]);
+            scrollBottom();
         })
 
 
@@ -123,7 +133,7 @@ const ChatAside = () => {
                         onClick={() => handleChat(chat)}
                         disabled={messaging}
                     >
-                        <IconSend size={20} />
+                        {messaging ? <Loader size="sm" /> : <IconSend size={20} />}
                     </ActionIcon>
                 </Group>
             </AppShell.Section>
