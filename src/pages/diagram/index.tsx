@@ -1,33 +1,26 @@
 import Dagre from "@dagrejs/dagre"
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useState } from "react"
 import ReactFlow, {
     addEdge,
     Background,
     Controls,
-    Node,
     OnConnect,
-    Panel,
     useEdgesState,
     useNodesState,
     useReactFlow,
-    Edge,
 } from "reactflow"
-import { useLocation } from 'react-router-dom';
+import { useLocation } from "react-router-dom"
 
 import { nodeTypes } from "../../nodes"
 import { edgeTypes } from "../../edges"
 import { useRemoveLogo } from "../../hooks"
-import { ActionIcon, Tooltip } from "@mantine/core"
-import { IconLayout } from "@tabler/icons-react"
-import { useHotkeys, useToggle } from "@mantine/hooks"
-import { DiagramManager } from "@/diagram/manager";
-
-const directionRecords: Record<string, string> = {
-    TB: "Top to Bottom",
-    BT: "Bottom to Top",
-    RL: "Right to Left",
-    LR: "Left to Right",
-}
+import { useHotkeys } from "@mantine/hooks"
+import { DiagramManager } from "@/diagram/manager"
+import { useWtf } from "@/hooks/use-wtf"
+import {
+    getDiagramManager,
+    useDiagramManager,
+} from "@/store/digaram-mananger-store"
 
 const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}))
 
@@ -41,29 +34,20 @@ const getLayoutedElements = (nodes: any, edges: any, options: any) => {
 
     return {
         nodes: nodes.map((node: any) => {
-            let { x, y } = g.node(node.id)
+            const { x, y } = g.node(node.id)
 
-            x = x * 3
-            y = y * 2
-
-            return { ...node, position: { x, y } }
+            return { ...node, position: { 
+                x: x * 3,
+                y: y * 2
+            } }
         }),
         edges,
     }
 }
 
-const diagramManager = new DiagramManager()
-
 const DiagramPage = () => {
     useRemoveLogo()
-    useHotkeys([
-        [
-            "A+A",
-            () =>
-                (window.location.href =
-                    "https://www.youtube.com/watch?v=dQw4w9WgXcQ"),
-        ],
-    ])
+    useWtf()
 
     const { fitView } = useReactFlow()
     const [nodes, setNodes, onNodesChange] = useNodesState([])
@@ -85,25 +69,18 @@ const DiagramPage = () => {
         })
         // toggleDirection()
     }
-    
+
+    const diagramManager = useDiagramManager()
+
     // Handle input and render chart
-    const location = useLocation();
     useEffect(() => {
-        const query = location.state?.query || '';
-        if (!query) return;
-
-        diagramManager.start(query);
-
-        // create interval to render every 1 second
         const interval = setInterval(() => {
-            const { needRerender, isGenerating } = diagramManager;
-
-            if (!needRerender) {
-                if (!isGenerating) {
-                    clearInterval(interval);
+            if (!diagramManager.needRerender) {
+                if (!diagramManager.isGenerating) {
+                    return
                 }
 
-                return;
+                return
             }
 
             console.log('rendering...')
@@ -115,6 +92,24 @@ const DiagramPage = () => {
         return () => clearInterval(interval);
     }, [])
 
+    // useEffect(() => {
+    //     const { needRerender, isGenerating } = diagramManagerState
+    //     console.log("rendering...", needRerender, isGenerating)
+
+    // if (!needRerender) {
+    //     if (!isGenerating) {
+    //         return
+    //     }
+
+    //     return
+    // }
+
+    // const isAutoLayout = diagramManager.isNeedGenLayout
+    // console.log("rendering...", isAutoLayout)
+    // setDiagram(diagramManager.nodes, diagramManager.edges, isAutoLayout)
+
+    // diagramManager.needRerender = false
+    // }, [diagramManagerState])
 
     return (
         <ReactFlow

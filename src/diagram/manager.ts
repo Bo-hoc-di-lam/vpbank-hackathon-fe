@@ -1,26 +1,24 @@
-import { WSEvent } from "@/type/ws_data";
-import { WSClient } from "@/ws/client";
-import {
-    Node,
-	Edge,
-} from "reactflow"
+import { WSEvent } from "@/type/ws_data"
+import { WSClient } from "@/ws/client"
+import { Node, Edge } from "reactflow"
 
 export class DiagramManager {
-	public nodes: Node<any>[] = [];
-	public edges: Edge<any>[] = [];
-	public isGenerating: boolean = false;
-	public needRerender: boolean = false;
+    public nodes: Node<any>[] = []
+    public edges: Edge<any>[] = []
+    public isGenerating: boolean = false
+    public needRerender: boolean = false
+    public comment: string = ""
 
-	private ws: WSClient;
+    private ws: WSClient
 
-	constructor() {
-		this.ws = new WSClient();
+    constructor() {
+        this.ws = new WSClient()
 
-		this.ws.on(WSEvent.AddNode, (data : any) => {
-			this.needRerender = true;
+        this.ws.on(WSEvent.AddNode, (data: any) => {
+            this.needRerender = true
             this.nodes.push({
                 id: data.id,
-                type: 'common',
+                type: "common",
                 data: {
                     label: data.text,
                 },
@@ -30,7 +28,7 @@ export class DiagramManager {
         });
     
         this.ws.on(WSEvent.AddLink, (data: any) => {
-			this.needRerender = true;
+            this.needRerender = true
             this.edges.push({
                 id: data.id,
                 source: data.from_id,
@@ -72,9 +70,8 @@ export class DiagramManager {
 		});
 	}
 
-	public start(query : string) {
-		this.isGenerating = true;
-		this.isNeedGenLayout = true;
-		this.ws.sendPrompt(query);
-	}
+    public start(query: string) {
+        this.isGenerating = true
+        this.ws.sendPrompt(query)
+    }
 }

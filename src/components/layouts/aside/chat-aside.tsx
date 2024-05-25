@@ -1,3 +1,4 @@
+import { useDiagramManager } from "@/store/digaram-mananger-store"
 import {
     ActionIcon,
     AppShell,
@@ -6,9 +7,9 @@ import {
     Skeleton,
     Textarea,
 } from "@mantine/core"
-import { useListState } from "@mantine/hooks"
+import { useCounter, useListState } from "@mantine/hooks"
 import { IconSend } from "@tabler/icons-react"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 interface Message {
     role: string
@@ -19,28 +20,8 @@ const ChatAside = () => {
     const [conversation, handlers] = useListState<Message>([])
     const [chat, setChat] = useState<string>("")
     const [messaging, setMessaging] = useState<boolean>(false)
-    const botResponse = [
-        {
-            role: "bot",
-            message: "Hello there!",
-        },
-        {
-            role: "bot",
-            message: "General Kenobi!",
-        },
-        {
-            role: "bot",
-            message: "You are a bold one!",
-        },
-        {
-            role: "bot",
-            message: "I have the high ground!",
-        },
-        {
-            role: "bot",
-            message: "I hate you!",
-        },
-    ]
+    const [botChatIndex, setBotChatIndex] = useState<number>(0)
+    const [count, coundHandlers] = useCounter(0, { min: 0 })
 
     const chatSectionViewport = useRef<HTMLDivElement>(null)
 
@@ -53,22 +34,53 @@ const ChatAside = () => {
         }, 100)
     }
 
-    const handleChat = () => {
+    const diagramManager = useDiagramManager()
+
+    const handleChat = (prompt: string) => {
+        diagramManager.start(prompt)
+        setChat("")
         setMessaging(true)
-        handlers.append({ role: "user", message: chat })
+        handlers.append({ role: "user", message: prompt })
         scrollBottom()
         handlers.append({ role: "bot", message: "l" })
+        setBotChatIndex(conversation.length - 1)
+        console.log(conversation)
+
         scrollBottom()
-        setTimeout(() => {
-            handlers.pop()
-            handlers.append(
-                botResponse[Math.floor(Math.random() * botResponse.length)]
-            )
-            setMessaging(false)
-        }, 1500)
-        scrollBottom()
-        setChat("")
     }
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (diagramManager.needRerender) {
+                if (diagramManager.isGenerating) {
+                    setMessaging(true)
+                    if (diagramManager.comment !== "") {
+                        console.log("comment", diagramManager.comment)
+                        console.log("botChatIndex", botChatIndex)
+
+                        handlers.setItem(botChatIndex, {
+                            role: "bot",
+                            message: diagramManager.comment,
+                        })
+                        diagramManager.comment = ""
+                    }
+                    coundHandlers.increment()
+                } else {
+                    if (count > 0) {
+                        handlers.setItem(botChatIndex, {
+                            role: "bot",
+                            message: "Done",
+                        })
+                    }
+                    setMessaging(false)
+                    scrollBottom()
+                    clearInterval(interval)
+                }
+            }
+        }, 1000)
+
+        return () => clearInterval(interval)
+    }, [handleChat])
 
     return (
         <>
@@ -99,7 +111,8 @@ const ChatAside = () => {
                     <ActionIcon
                         aria-label="Send message"
                         size="lg"
-                        onClick={handleChat}
+                        onClick={() => handleChat(chat)}
+                        disabled={messaging}
                     >
                         <IconSend size={20} />
                     </ActionIcon>
