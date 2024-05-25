@@ -11,6 +11,7 @@ import { IconSend } from "@tabler/icons-react"
 import { useEffect, useRef, useState } from "react"
 import ReactMarkdown from 'react-markdown'
 import toast from 'react-hot-toast';
+import { useReactFlow } from "reactflow"
 
 interface Message {
     role: string
@@ -23,6 +24,7 @@ const ChatAside = () => {
     const [messaging, setMessaging] = useState<boolean>(false)
 
     const chatSectionViewport = useRef<HTMLDivElement>(null)
+    const reactFlow = useReactFlow()
 
     const scrollBottom = () => {
         setTimeout(() => {
@@ -42,7 +44,7 @@ const ChatAside = () => {
         }
 
         // show toast loading
-        toast.loading('Getting diagram...');
+        toast.loading('Generating diagram...');
 
         diagramManager.start(prompt);
         setChat("");
@@ -81,7 +83,7 @@ const ChatAside = () => {
                 { role: "bot", message: "Done" },
             ]);
             scrollBottom();
-
+            reactFlow.fitView();
             toast.success('Diagram generated');
         })
     }, [])
