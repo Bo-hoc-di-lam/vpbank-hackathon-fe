@@ -1,15 +1,15 @@
 import { NodeProps } from "reactflow"
 import BaseNode, { BaseNodeData } from "./BaseNode"
 
-export interface CircleNodeData extends BaseNodeData {}
+export interface CommonNodeData extends BaseNodeData {}
 
-export const CircleNode = ({ data, selected }: NodeProps<CircleNodeData>) => {
+export const CommonAWSNode = ({ data, selected }: NodeProps<CommonNodeData>) => {
     return (
         <BaseNode
             label={data.label}
             icon={data.icon}
             selected={selected}
-            className="w-[100px] h-[100px] rounded-full"
+            className="w-[150px] h-[50px] rounded-md"
         />
     )
 }

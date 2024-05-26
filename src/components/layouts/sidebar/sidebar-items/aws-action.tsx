@@ -12,7 +12,16 @@ const AWSAction = () => {
 			return;
 		}
 
+        // check if isGenerating
+        // if (diagramManager.isGenerating) {
+        //     toast.error("Generating in progress");
+        //     return;
+        // }
+
+        toast.loading("Generating AWS Service");
 		diagramManager.genAWS();
+
+        // toast.success("AWS Service generated");
 	};
 
 

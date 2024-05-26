@@ -20,9 +20,11 @@ import {
     useNodeId,
     useReactFlow,
 } from "reactflow"
+import { checkIconExist } from "@/utils/aws-icon"
 
 export interface BaseNodeData {
     label?: string
+    icon?: string
 }
 
 interface BaseNodeProps extends BaseNodeData {
@@ -34,6 +36,7 @@ interface BaseNodeProps extends BaseNodeData {
 const BaseNode = ({
     label,
     selected,
+    icon,
     className = "",
     labelClassName = "",
 }: BaseNodeProps) => {
@@ -41,6 +44,7 @@ const BaseNode = ({
         useDisclosure(false)
 
     const { getNode, setNodes, getNodes } = useReactFlow()
+    const [iconExist, setIconExist] = useState(false)
     const nodeId = useNodeId()
     const isNodeSelected = useCheckNodeSelected(nodeId!)
 
@@ -94,6 +98,14 @@ const BaseNode = ({
         }
     }, [selected])
 
+    useEffect(() => {
+        if (icon) {
+            checkIconExist(icon).then((exist) => {
+                setIconExist(exist)
+            })
+        }
+    }, [icon])
+
     return (
         <>
             <NodeToolbar position={Position.Top} offset={10} align="end">
@@ -145,25 +157,38 @@ const BaseNode = ({
                 className={cn(
                     ` ${selected ? "border-2" : "border"} ${
                         isNodeSelected ? "border-green-600" : "border-black"
-                    } p-2.5 bg-white flex items-center justify-center z-50 relative`,
+                    } bg-white flex items-center justify-center ${iconExist ? 'px-1 py-2.5' : 'p-2.5'}`,
                     className
                 )}
             >
-                {label && (
-                    <div className={cn("text-center text-xs", labelClassName)}>
-                        {editMode ? (
-                            <input
-                                value={labelEdit}
-                                onChange={(e) =>
-                                    setLabelEdit(e.currentTarget.value)
-                                }
-                                className="w-full text-center border border-black rounded-sm"
+                <div className="flex items-center w-full">
+                    <div>
+                        {iconExist && (
+                            <img
+                                src={`https://app.eraser.io/static/canvas-icons/${icon}.svg`}
+                                alt={icon}
+                                className="w-8 h-8"
                             />
-                        ) : (
-                            <span>{label}</span>
                         )}
                     </div>
-                )}
+                    <div className="flex-grow text-center text-xs">
+                        {label && (
+                            <div className={cn(labelClassName)}>
+                                {editMode ? (
+                                    <input
+                                        value={labelEdit}
+                                        onChange={(e) =>
+                                            setLabelEdit(e.currentTarget.value)
+                                        }
+                                        className="w-full text-center border border-black rounded-sm"
+                                    />
+                                ) : (
+                                    <span>{label}</span>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
                 <Handle type="source" position={Position.Bottom} />
                 <Handle type="target" position={Position.Top} />
             </div>

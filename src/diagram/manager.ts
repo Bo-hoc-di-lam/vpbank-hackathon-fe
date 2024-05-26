@@ -5,6 +5,7 @@ import { IconType, WSEvent } from "@/type/ws_data"
 import { WSClient } from "@/ws/client"
 import { title } from "process"
 import { Node, Edge } from "reactflow"
+import { convertIconName } from "@/utils/aws-icon"
 
 export class DiagramManager {
     public nodes: Node<any>[] = []
@@ -76,6 +77,32 @@ export class DiagramManager {
         });
 
         this.ws.on(WSEvent.AddLink, (data: any) => {
+            this.needRerender = true
+            this.edges.push({
+                id: data.id,
+                source: data.from_id,
+                target: data.to_id,
+                data: {
+                    label: data.text,
+                }
+            });
+        });
+
+        this.ws.on(WSEvent.AddNodeAWS, (data: any) => {
+            this.needRerender = true
+            this.nodes.push({
+                id: data.id,
+                type: "common-aws",
+                data: {
+                    label: data.text,
+                    icon: convertIconName(data.icon)
+                },
+                position: data.position,
+                // parentNode: data.sub_graph,
+            });
+        });
+
+        this.ws.on(WSEvent.AddLinkAWS, (data: any) => {
             this.needRerender = true
             this.edges.push({
                 id: data.id,

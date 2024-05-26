@@ -5,6 +5,7 @@ import { RhombusNode } from "./RhombusNode"
 import { CommonNode } from "./CommonNode"
 import SubGraphNode from "./SubGraphNode"
 import { GroupShape } from "./GroupShape"
+import { CommonAWSNode } from "./CommonAWS"
 
 export const initialNodes = [
     {
@@ -42,4 +43,5 @@ export const nodeTypes = {
     rhombus: RhombusNode,
     subgraph: SubGraphNode,
     "custom-group": GroupShape,
+    "common-aws": CommonAWSNode,
 } satisfies NodeTypes

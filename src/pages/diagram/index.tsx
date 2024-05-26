@@ -80,13 +80,14 @@ const basicNodeInfo = (info: any): any => {
         id: info.id,
         data: {
             label: info.data?.label || info.id,
+            icon: info.data?.icon,
         },
         parentNode: info.parentNode,
         position: {
             x: info.x,
             y: info.y,
         },
-        type: 'common',
+        type: info.type || 'common',
     };
 
     return node;
