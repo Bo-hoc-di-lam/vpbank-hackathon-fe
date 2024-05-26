@@ -8,7 +8,7 @@ import {
     Loader,
 } from "@mantine/core"
 import { IconSend } from "@tabler/icons-react"
-import { useEffect, useRef, useState } from "react"
+import { createContext, useEffect, useRef, useState } from "react"
 import ReactMarkdown from 'react-markdown'
 import toast from 'react-hot-toast';
 import { useReactFlow } from "reactflow"
@@ -61,7 +61,25 @@ const ChatAside = () => {
         scrollBottom();
     };
 
+    let AWSGenerating = false
+    const handleAWSChat = () => {
+        if (AWSGenerating) {
+            return;
+        }
+        AWSGenerating = true;
+        setChat("");
+        setMessaging(true);
+
+        setConversation((prevConversation) => [
+            ...prevConversation,
+            { role: "bot", message: "l" },
+        ]);
+
+        scrollBottom();
+    };
+
     useEffect(() => {
+        diagramManager.setHandleAWSChatCallback(handleAWSChat);
         diagramManager.onCommentChange((comment) => {
             if (comment !== "") {
                 setConversation((prevConversation) => {

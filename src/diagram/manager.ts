@@ -29,6 +29,11 @@ export class DiagramManager {
     public interval: NodeJS.Timeout | null = null
     private started: boolean = false
 
+    private handleAWSChatCallback: () => void;
+
+    public setHandleAWSChatCallback(callback: () => void) {
+        this.handleAWSChatCallback = callback;
+    }
 
     private ws: WSClient
 
@@ -138,6 +143,21 @@ export class DiagramManager {
                 })
             }
         });
+
+        this.ws.on(WSEvent.SetCommentAWS, (data: any) => {
+            this.comment = data;
+
+            if (this.handleAWSChatCallback) {
+                this.handleAWSChatCallback();
+            }
+
+            if (this.onCommentChangeHandlers) {
+                this.onCommentChangeHandlers.forEach(handler => {
+                    handler(data)
+                })
+            }
+        });
+
 
         // this.ws.on(WSEvent.AddSubGraph, (data: any) => {
         //     this.needRerender = true;
