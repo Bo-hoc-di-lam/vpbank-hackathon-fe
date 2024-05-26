@@ -15,7 +15,11 @@ export class DiagramManager {
     public needRerender: boolean = false
     public comment: string = ""
     public mermaid: string = ""
+    public nameplate: string = ""
+    public userCounter: number = 0
 
+    private onUserCounterChangeHandlers: ((count: number) => void)[] = []
+    private onRoomInfoHandlers: ((nameplate: string) => void)[] = []
     private onCommentChangeHandlers: ((comment: string) => void)[] = []
     private onDoneHandlers: (() => void)[] = []
     private onMermaidHandlers: ((mermaid: string) => void)[] = []
@@ -24,10 +28,39 @@ export class DiagramManager {
     public interval: NodeJS.Timeout | null = null
     private started: boolean = false
 
+
     private ws: WSClient
 
     constructor() {
         this.ws = new WSClient()
+
+
+        this.ws.on(WSEvent.UserJoined, (uid: string) => {
+            this.userCounter++
+            if (this.onUserCounterChangeHandlers) {
+                this.onUserCounterChangeHandlers.forEach(handler => {
+                    handler(this.userCounter)
+                })
+            }
+        })
+
+        this.ws.on(WSEvent.UserLeave, (uid: string) => {
+            this.userCounter--
+            if (this.onUserCounterChangeHandlers) {
+                this.onUserCounterChangeHandlers.forEach(handler => {
+                    handler(this.userCounter)
+                })
+            }
+        })
+
+        this.ws.on(WSEvent.RoomInfo, (data: string) => {
+            this.nameplate = data
+            if (this.onRoomInfoHandlers) {
+                this.onRoomInfoHandlers.forEach(handler => {
+                    handler(data)
+                })
+            }
+        })
 
         this.ws.on(WSEvent.AddNode, (data: any) => {
             this.needRerender = true
@@ -90,23 +123,24 @@ export class DiagramManager {
         // });
 
         this.ws.on(WSEvent.Done, () => {
+            this.started = true
             // clear interval
             if (this.interval) {
                 clearInterval(this.interval)
             }
 
-            if(this.renderFunc) {
+            if (this.renderFunc) {
                 console.log("last render")
                 this.needRerender = true
                 this.renderFunc()
             }
 
-			if (this.onDoneHandlers) {
-				this.onDoneHandlers.forEach(handler => {
-					handler()
-				})
-			}
-		});
+            if (this.onDoneHandlers) {
+                this.onDoneHandlers.forEach(handler => {
+                    handler()
+                })
+            }
+        });
 
         this.ws.on(WSEvent.Mermaid, (data: any) => {
             this.mermaid = data
@@ -122,6 +156,10 @@ export class DiagramManager {
         this.ws.on(WSEvent.ResetAWS, () => {
             this.clearData()
         })
+    }
+
+    public joinRoom(nameplate: string) {
+        this.ws.joinRoom(nameplate)
     }
 
     public start(query: string) {
@@ -154,6 +192,12 @@ export class DiagramManager {
         this.ws.sendEditPrompt(query, vertex)
     }
 
+
+
+    public onRoomInfo(handler: (nameplate: string) => void) {
+        this.onRoomInfoHandlers.push(handler)
+    }
+
     public onCommentChange(handler: (comment: string) => void) {
         this.onCommentChangeHandlers.push(handler)
     }
@@ -165,6 +209,13 @@ export class DiagramManager {
     public onMermaid(handler: (mermaid: string) => void) {
         this.onMermaidHandlers.push(handler)
     }
+
+    public onUserCounterChange(handler: (count: number) => void) {
+        if (this.onUserCounterChangeHandlers) {
+            this.onUserCounterChangeHandlers.push(handler)
+        }
+    }
+
 
     public setInterval(renderFunc: () => void, intervalTime: number) {
         this.renderFunc = renderFunc

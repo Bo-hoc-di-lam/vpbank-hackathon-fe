@@ -19,7 +19,9 @@ interface Message {
 }
 
 const ChatAside = () => {
-    const [conversation, setConversation] = useState<Message[]>([])
+    const [conversation, setConversation] = useState<Message[]>([
+        { role: "bot", message: "Hi, how can I help you?" }
+    ])
     const [chat, setChat] = useState<string>("")
     const [messaging, setMessaging] = useState<boolean>(false)
 
@@ -78,13 +80,13 @@ const ChatAside = () => {
             // hide toast loading
             toast.dismiss();
             setMessaging(false);
-            setConversation((prevConversation) => [
-                ...prevConversation,
-                { role: "bot", message: "Done" },
-            ]);
+            // setConversation((prevConversation) => [
+            //     ...prevConversation,
+            //     { role: "bot", message: "Done" },
+            // ]);
             scrollBottom();
             reactFlow.fitView();
-            toast.success('Diagram generated');
+            toast.success('Done!');
         })
     }, [])
 

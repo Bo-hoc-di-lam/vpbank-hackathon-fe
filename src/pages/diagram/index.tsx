@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ReactFlow, {
     addEdge,
     Background,
@@ -22,6 +22,9 @@ import {
     useDiagramManager,
 } from "@/store/digaram-mananger-store";
 import { clear } from "console";
+import toast from "react-hot-toast";
+import { Button, Indicator } from "@mantine/core";
+import { IconUser, IconUsers } from "@tabler/icons-react";
 
 const elk = new ELK();
 
@@ -172,7 +175,19 @@ const DiagramPage = () => {
         diagramManager.setSelectedNodes(nodes);
     }
 
+    const [nameplate, setNameplate] = useState<string>("");
+    const [userCount, setUserCount] = useState<number>(0);
+
     useEffect(() => {
+        diagramManager.onUserCounterChange((count) => {
+            setUserCount(count);
+        });
+
+        diagramManager.onRoomInfo((nameplate) => {
+            toast.success(`Room name: ${nameplate}`);
+            setNameplate(nameplate);
+        });
+
         diagramManager.setInterval(async () => {
             if (!diagramManager.needRerender) {
                 return;
@@ -211,6 +226,14 @@ const DiagramPage = () => {
         >
             <Background />
             <Controls />
+            <Button variant="filled" size="sm" radius="xl">
+                <Indicator label={userCount} color="yellow" size={16} processing >
+                    {userCount == 1 ? <IconUser size={16} /> : <IconUsers size={16} />}
+                </Indicator>
+                <span className="pl-2">
+                    {nameplate}
+                </span>
+            </Button>
         </ReactFlow>
     );
 };

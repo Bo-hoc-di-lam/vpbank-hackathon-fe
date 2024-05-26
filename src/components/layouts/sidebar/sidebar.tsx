@@ -1,7 +1,7 @@
 import { ActionIcon, AppShell, Stack, Title, Tooltip } from "@mantine/core"
-import { IconEdit, IconChartBar, IconCode } from "@tabler/icons-react"
+import { IconEdit, IconChartBar, IconCode, IconDoor } from "@tabler/icons-react"
 import { useMemo, useState } from "react"
-import { ManualEdit, ViewMermaid, AWSAction } from "./sidebar-items"
+import { ManualEdit, ViewMermaid, AWSAction, Room } from "./sidebar-items"
 
 interface SidebarProps {
     openSidebar: () => void
@@ -17,6 +17,11 @@ interface SidebarItem {
 const Sidebar = ({ openSidebar, closeSidebar }: SidebarProps) => {
     const sidebarItems = useMemo<SidebarItem[]>(() => {
         return [
+            {
+                icon: <IconDoor size={24} />,
+                label: "Room",
+                chilren: <Room />,
+            },
             {
                 icon: <IconEdit size={24} />,
                 label: "Manual edit",
