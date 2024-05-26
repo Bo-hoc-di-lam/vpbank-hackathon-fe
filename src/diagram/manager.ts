@@ -37,6 +37,7 @@ export class DiagramManager {
 
 
         this.ws.on(WSEvent.UserJoined, (uid: string) => {
+            console.info("user joined", uid)
             this.userCounter++
             if (this.onUserCounterChangeHandlers) {
                 this.onUserCounterChangeHandlers.forEach(handler => {
@@ -46,6 +47,7 @@ export class DiagramManager {
         })
 
         this.ws.on(WSEvent.UserLeave, (uid: string) => {
+            console.info("user leave", uid)
             this.userCounter--
             if (this.onUserCounterChangeHandlers) {
                 this.onUserCounterChangeHandlers.forEach(handler => {
