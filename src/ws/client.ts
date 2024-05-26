@@ -2,7 +2,7 @@
 import { Link, SubGraph, Vertex } from '@/type/diagram'
 import { Message, WSEvent, Prompt, MessageData, EditNode, GenerateIcon, IconType } from '@/type/ws_data'
 
-type MessageCallback<T extends MessageData> = (msg: Message<T>) => void
+type MessageCallback<T extends MessageData> = (msg: T) => void
 
 interface WSEventMap {
     // info
@@ -68,7 +68,7 @@ export class WSClient {
             console.error(evt)
         },
         [WSEvent.RoomInfo]: (evt) => {
-            this.roomNameplate = evt.data
+            this.roomNameplate = evt
         }
     }
 

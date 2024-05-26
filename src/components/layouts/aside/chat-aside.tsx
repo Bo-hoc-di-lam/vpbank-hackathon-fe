@@ -78,13 +78,13 @@ const ChatAside = () => {
             // hide toast loading
             toast.dismiss();
             setMessaging(false);
-            setConversation((prevConversation) => [
-                ...prevConversation,
-                { role: "bot", message: "Done" },
-            ]);
+            // setConversation((prevConversation) => [
+            //     ...prevConversation,
+            //     { role: "bot", message: "Done" },
+            // ]);
             scrollBottom();
             reactFlow.fitView();
-            toast.success('Diagram generated');
+            toast.success('Done!');
         })
     }, [])
 
