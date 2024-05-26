@@ -129,7 +129,7 @@ const BaseNode = ({
                                 <IconEdit />
                             </ActionIcon>
                         </Tooltip>
-                        <Tooltip label={isNodeSelected ? "Discard" : "Keep"}>
+                        <Tooltip label={isNodeSelected ? "Discard" : "Mask as edit"}>
                             <ActionIcon
                                 variant="light"
                                 color={isNodeSelected ? "red" : "green"}
