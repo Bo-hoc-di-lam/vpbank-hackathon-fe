@@ -1,7 +1,7 @@
 import { initialEdges } from "@/edges"
 import { initialNodes, nodeTypes } from "@/nodes"
 import { Vertex } from "@/type/diagram"
-import { WSEvent } from "@/type/ws_data"
+import { IconType, WSEvent } from "@/type/ws_data"
 import { WSClient } from "@/ws/client"
 import { title } from "process"
 import { Node, Edge } from "reactflow"
@@ -117,6 +117,11 @@ export class DiagramManager {
                 })
             }
         })
+
+
+        this.ws.on(WSEvent.ResetAWS, () => {
+            this.clearData()
+        })
     }
 
     public start(query: string) {
@@ -130,6 +135,13 @@ export class DiagramManager {
         }
         this.started = true
     }
+
+    public genAWS() {
+        this.isGenerating = true
+        this.resetInterval()
+        this.ws.generateIcon(IconType.AWS)
+    }
+
     public edit(query: string) {
         this.isGenerating = true
         this.resetInterval()
@@ -161,9 +173,6 @@ export class DiagramManager {
 
     public setSelectedNodes(nodes: Node<any>[]) {
         this.selectedNodes = nodes
-        console.log("selected nodes", this.selectedNodes)
-        console.log("vertex", this.selectedVertex())
-
     }
 
 
@@ -196,7 +205,6 @@ export class DiagramManager {
     }
 
     private nodeInGroup(group: string) {
-        console.log("group", group)
         let nodes = this.nodes.filter(node => node.parentNode === group)
         // nested child group
         let subGroups = this.subGraphs.filter(node => node.parentNode === group)

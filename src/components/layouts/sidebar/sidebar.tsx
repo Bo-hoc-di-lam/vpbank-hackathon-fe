@@ -1,7 +1,7 @@
 import { ActionIcon, AppShell, Stack, Title, Tooltip } from "@mantine/core"
-import { IconEdit, IconChartBar } from "@tabler/icons-react"
+import { IconEdit, IconChartBar, IconCode } from "@tabler/icons-react"
 import { useMemo, useState } from "react"
-import { ManualEdit, ViewMermaid } from "./sidebar-items"
+import { ManualEdit, ViewMermaid, AWSAction } from "./sidebar-items"
 
 interface SidebarProps {
     openSidebar: () => void
@@ -26,6 +26,11 @@ const Sidebar = ({ openSidebar, closeSidebar }: SidebarProps) => {
                 icon: <IconChartBar size={24} />,
                 label: "View Mermaid Code",
                 chilren: <ViewMermaid />,
+            },
+            {
+                icon: <IconCode size={24} />,
+                label: "Generate AWS Service",
+                chilren: <AWSAction />,
             },
         ]
     }, [])

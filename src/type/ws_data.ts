@@ -47,8 +47,7 @@ export enum WSEvent {
     DelSubGraphAWS = 'DEL_SUB_GRAPH_AWS',
     SetNodePositionAWS = 'SET_NODE_POSITION_AWS',
     SetCommentAWS = 'SET_COMMENT_AWS',
-
-
+    ResetAWS = 'RESET_AWS',
 }
 
 export type MessageData = string | Prompt | Vertex | Link | SubGraph | GenerateIcon
