@@ -19,7 +19,9 @@ interface Message {
 }
 
 const ChatAside = () => {
-    const [conversation, setConversation] = useState<Message[]>([])
+    const [conversation, setConversation] = useState<Message[]>([
+        { role: "bot", message: "Hi, how can I help you?" }
+    ])
     const [chat, setChat] = useState<string>("")
     const [messaging, setMessaging] = useState<boolean>(false)
 
