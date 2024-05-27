@@ -43,7 +43,7 @@ export class DiagramManager {
         this.ws = new WSClient()
 
         this.ws.on(WSEvent.SetTerraformAWS, (data: string) => {
-            this.terraform = data
+            this.terraform += data
             if (this.onTerraformHandlers) {
                 this.onTerraformHandlers.forEach(handler => {
                     handler(this.terraform)
@@ -99,6 +99,7 @@ export class DiagramManager {
                 id: data.id,
                 source: data.from_id,
                 target: data.to_id,
+                label: data.text,
                 data: {
                     label: data.text,
                 }
@@ -145,17 +146,17 @@ export class DiagramManager {
         })
 
         this.ws.on(WSEvent.SetComment, (data: any) => {
-            this.comment = data
+            this.comment += data
 
             if (this.onCommentChangeHandlers) {
                 this.onCommentChangeHandlers.forEach(handler => {
-                    handler(data)
+                    handler(this.comment)
                 })
             }
         });
 
         this.ws.on(WSEvent.SetCommentAWS, (data: any) => {
-            this.comment = data;
+            this.comment += data;
 
             if (this.handleAWSChatCallback) {
                 this.handleAWSChatCallback();
@@ -163,7 +164,7 @@ export class DiagramManager {
 
             if (this.onCommentChangeHandlers) {
                 this.onCommentChangeHandlers.forEach(handler => {
-                    handler(data)
+                    handler(this.comment)
                 })
             }
         });
@@ -241,6 +242,7 @@ export class DiagramManager {
 
     public genTerraform() {
         if (!this.mermaid) return
+        this.terraform = ""
         this.ws.generateTerraform(SystemType.AWS)
     }
 
@@ -298,6 +300,7 @@ export class DiagramManager {
         this.nodes.length = 0
         this.edges.length = 0
         this.subGraphs.length = 0
+        this.comment = ""
     }
 
     private selectedVertex(): Node<any>[] {
