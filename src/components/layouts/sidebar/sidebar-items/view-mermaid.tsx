@@ -1,16 +1,18 @@
 import { useDiagramManager } from '@/store/digaram-mananger-store';
-import { useClipboard } from "@mantine/hooks"
+import { useClipboard, useDisclosure } from "@mantine/hooks"
 import { useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import toast from 'react-hot-toast';
-import { Button } from "@mantine/core";
+import { Button, Modal } from "@mantine/core";
 
 import { exportToMermaidFile } from '@/utils/file';
+import { IconCopy, IconFileExport } from '@tabler/icons-react';
 
 const ViewMermaid = () => {
     const diagramManager = useDiagramManager();
     const [codeString, setCodeString] = useState<string>(diagramManager.mermaid);
+    const [modalOpened, { open, close }] = useDisclosure(false);
 
     diagramManager.onMermaid((mermaid) => {
         setCodeString(mermaid);
@@ -44,26 +46,42 @@ const ViewMermaid = () => {
 
     return (
         <div className="flex flex-col gap-4">
-            <SyntaxHighlighter language="plaintext" style={dracula} wrapLines={true}
-                lineProps={{ style: { wordBreak: 'break-all', whiteSpace: 'pre-wrap' } }}>
-                {codeString}
-            </SyntaxHighlighter>
+            <Modal opened={modalOpened} onClose={close} title="Mermaid" size="100%">
+                <div className='flex gap-4'>
+                    <Button
+                        variant="light"
+                        onClick={copyToClipboard}
+                        disabled={codeString === ""}
+                    >
+                        Copy to Clipboard
+                        <IconCopy size={16} />
+                    </Button>
+                    <Button
+                        variant="light"
+                        onClick={exportToFile}
+                        disabled={codeString === ""}
+                    >
+                        Export to File
+                        <IconFileExport size={16} />
+                    </Button>
+                </div>
+                <SyntaxHighlighter language="plaintext" style={dracula} wrapLines={true}
+                    lineProps={{ style: { wordBreak: 'break-all', whiteSpace: 'pre-wrap' } }}>
+
+                    {codeString}
+                </SyntaxHighlighter>
+
+
+            </Modal>
             <Button
                 fullWidth
-                variant="light"
-                onClick={copyToClipboard}
-                disabled={codeString === ""}
+                variant='light'
+                onClick={open}
+            // disabled={codeString === ""}
             >
-                Copy to Clipboard
+                View
             </Button>
-            <Button
-                fullWidth
-                variant="light"
-                onClick={exportToFile}
-                disabled={codeString === ""}
-            >
-                Export to File
-            </Button>
+
         </div>
     );
 };
