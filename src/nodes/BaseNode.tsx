@@ -1,36 +1,37 @@
 import {
     useCheckNodeSelected,
     useSelectedNodeStore,
-} from "@/store/selected-node-store"
-import { cn } from "@/utils/cn"
-import { ActionIcon, Group, Tooltip } from "@mantine/core"
-import { useDisclosure } from "@mantine/hooks"
+} from "@/store/selected-node-store";
+import { cn } from "@/utils/cn";
+import { ActionIcon, Group, Tooltip } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import {
     IconCheck,
     IconEdit,
     IconMinus,
     IconPin,
+    IconTrash,
     IconX,
-} from "@tabler/icons-react"
-import { useEffect, useState } from "react"
+} from "@tabler/icons-react";
+import { useEffect, useState } from "react";
 import {
     Handle,
     NodeToolbar,
     Position,
     useNodeId,
     useReactFlow,
-} from "reactflow"
-import { checkIconExist } from "@/utils/aws-icon"
+} from "reactflow";
+import { checkIconExist } from "@/utils/aws-icon";
 
 export interface BaseNodeData {
-    label?: string
-    icon?: string
+    label?: string;
+    icon?: string;
 }
 
 interface BaseNodeProps extends BaseNodeData {
-    selected: boolean
-    className?: string
-    labelClassName?: string
+    selected: boolean;
+    className?: string;
+    labelClassName?: string;
 }
 
 const BaseNode = ({
@@ -41,37 +42,37 @@ const BaseNode = ({
     labelClassName = "",
 }: BaseNodeProps) => {
     const [editMode, { open: openEditMode, close: closeEditMode }] =
-        useDisclosure(false)
+        useDisclosure(false);
 
-    const { getNode, setNodes, getNodes } = useReactFlow()
-    const [iconExist, setIconExist] = useState(false)
-    const nodeId = useNodeId()
-    const isNodeSelected = useCheckNodeSelected(nodeId!)
+    const { getNode, setNodes, getNodes } = useReactFlow();
+    const [iconExist, setIconExist] = useState(false);
+    const nodeId = useNodeId();
+    const isNodeSelected = useCheckNodeSelected(nodeId!);
 
     const toggleSelectedNode = useSelectedNodeStore(
         (state) => state.toggleSelectedNode
-    )
+    );
 
     const handleClick = () => {
-        toggleSelectedNode(nodeId!)
-    }
+        toggleSelectedNode(nodeId!);
+    };
 
-    const [labelEdit, setLabelEdit] = useState(label)
-    const [isSaved, setIsSaved] = useState(false)
+    const [labelEdit, setLabelEdit] = useState(label);
+    const [isSaved, setIsSaved] = useState(false);
     const handleEditSave = () => {
-        setIsSaved(true)
-        closeEditMode()
-    }
+        setIsSaved(true);
+        closeEditMode();
+    };
 
     const handleEditCancel = () => {
-        setLabelEdit(label)
-        closeEditMode()
-    }
+        setLabelEdit(label);
+        closeEditMode();
+    };
 
     useEffect(() => {
         if (isSaved) {
-            const nodes = getNodes()
-            const node = getNode(nodeId!)
+            const nodes = getNodes();
+            const node = getNode(nodeId!);
             if (node) {
                 setNodes(
                     nodes.map((n) => {
@@ -82,29 +83,29 @@ const BaseNode = ({
                                     ...n.data,
                                     label: labelEdit,
                                 },
-                            }
+                            };
                         }
-                        return n
+                        return n;
                     })
-                )
+                );
             }
-            setIsSaved(false)
+            setIsSaved(false);
         }
-    }, [isSaved, labelEdit, nodeId, getNode, getNodes, setNodes])
+    }, [isSaved, labelEdit, nodeId, getNode, getNodes, setNodes]);
 
     useEffect(() => {
         if (!selected) {
-            handleEditCancel()
+            handleEditCancel();
         }
-    }, [selected])
+    }, [selected]);
 
     useEffect(() => {
         if (icon) {
             checkIconExist(icon).then((exist) => {
-                setIconExist(exist)
-            })
+                setIconExist(exist);
+            });
         }
-    }, [icon])
+    }, [icon]);
 
     return (
         <>
@@ -141,13 +142,30 @@ const BaseNode = ({
                                 <IconEdit />
                             </ActionIcon>
                         </Tooltip>
-                        <Tooltip label={isNodeSelected ? "Discard" : "Mask as edit"}>
+                        <Tooltip
+                            label={
+                                isNodeSelected ? "Discard" : "Keep this node"
+                            }
+                        >
                             <ActionIcon
                                 variant="light"
                                 color={isNodeSelected ? "red" : "green"}
                                 onClick={handleClick}
                             >
                                 {isNodeSelected ? <IconMinus /> : <IconPin />}
+                            </ActionIcon>
+                        </Tooltip>
+                        <Tooltip label="Delete">
+                            <ActionIcon
+                                variant="light"
+                                color="red"
+                                onClick={() => {
+                                    setNodes((nodes) =>
+                                        nodes.filter((n) => n.id !== nodeId)
+                                    );
+                                }}
+                            >
+                                <IconTrash />
                             </ActionIcon>
                         </Tooltip>
                     </Group>
@@ -157,7 +175,9 @@ const BaseNode = ({
                 className={cn(
                     ` ${selected ? "border-2" : "border"} ${
                         isNodeSelected ? "border-green-600" : "border-black"
-                    } bg-white flex items-center justify-center ${iconExist ? 'px-1 py-2.5' : 'p-2.5'}`,
+                    } bg-white flex items-center justify-center ${
+                        iconExist ? "px-1 py-2.5" : "p-2.5"
+                    }`,
                     className
                 )}
             >
@@ -193,7 +213,7 @@ const BaseNode = ({
                 <Handle type="target" position={Position.Top} />
             </div>
         </>
-    )
-}
+    );
+};
 
-export default BaseNode
+export default BaseNode;
