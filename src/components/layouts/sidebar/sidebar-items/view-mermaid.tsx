@@ -52,6 +52,7 @@ const ViewMermaid = () => {
                 fullWidth
                 variant="light"
                 onClick={copyToClipboard}
+                disabled={codeString === ""}
             >
                 Copy to Clipboard
             </Button>
@@ -59,6 +60,7 @@ const ViewMermaid = () => {
                 fullWidth
                 variant="light"
                 onClick={exportToFile}
+                disabled={codeString === ""}
             >
                 Export to File
             </Button>
