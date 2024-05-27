@@ -17,7 +17,7 @@ import { useRemoveLogo } from "../../hooks";
 import { useWtf } from "@/hooks/use-wtf";
 import { useDiagramManager } from "@/store/digaram-mananger-store";
 import toast from "react-hot-toast";
-import { ActionIcon, Button, Indicator, Tooltip } from "@mantine/core";
+import { ActionIcon, Button, Indicator } from "@mantine/core";
 import {
     IconMaximize,
     IconMinimize,
@@ -277,6 +277,7 @@ const DiagramPage = () => {
                     size="sm"
                     radius="xl"
                     onClick={handleCopyNameplate}
+                    className="group"
                 >
                     <Indicator
                         label={userCount}
@@ -290,7 +291,9 @@ const DiagramPage = () => {
                             <IconUsers size={16} />
                         )}
                     </Indicator>
-                    <span className="pl-2">{nameplate}</span>
+                    <span className="ml-2 group-hover:ml-4 w-0 group-hover:w-full transition-all duration-300">
+                        {nameplate}
+                    </span>
                 </Button>
             </Panel>
             <Panel position="bottom-right">
