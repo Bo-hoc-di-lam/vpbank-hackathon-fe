@@ -1,4 +1,5 @@
 import { useDiagramManager } from '@/store/digaram-mananger-store';
+import { useClipboard } from "@mantine/hooks"
 import { useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -15,17 +16,20 @@ const ViewMermaid = () => {
         setCodeString(mermaid);
     });
 
+    const clipboard = useClipboard({ timeout: 500 })
+
     const copyToClipboard = () => {
         if (!codeString) {
             toast.error('No code to copy');
             return;
         }
 
-        navigator.clipboard.writeText(codeString).then(() => {
-            toast.success('Copied to clipboard');
-        }, (err) => {
-            toast.error('Failed to copy to clipboard');
-        });
+        clipboard.copy(codeString)
+        if (clipboard.error) {
+            toast.error("Failed to copy to clipboard")
+            return
+        }
+        toast.success("Copied to clipboard")
     };
 
     const exportToFile = () => {
