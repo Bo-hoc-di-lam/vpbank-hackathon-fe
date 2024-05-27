@@ -155,8 +155,8 @@ const ChatUi = ({ role, message }: Message) => {
                 <div className="chat-image avatar">
                     <div className="w-10 rounded-full">
                         <img
-                            alt="Tailwind CSS chat bubble component"
-                            src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"
+                            alt="Bot avatar"
+                            src="https://www.shutterstock.com/image-vector/chatbot-robo-advisor-adviser-chat-600nw-1222464061.jpg"
                         />
                     </div>
                 </div>
