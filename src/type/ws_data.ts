@@ -1,6 +1,6 @@
 import { Link, SubGraph, Vertex } from "./diagram"
 
-export enum IconType {
+export enum SystemType {
     AWS = 'AWS',
 }
 
@@ -20,6 +20,8 @@ export enum WSEvent {
     PromptEdit = 'PROMPT_EDIT',
     GenerateIcon = 'GENERATE_ICON',
     JoinRoom = 'JOIN_ROOM',
+    GenerateCode = 'GENERATE_CODE',
+    Ping = 'PING',
 
 
     // server diagram response
@@ -34,6 +36,7 @@ export enum WSEvent {
     DelSubGraph = 'DEL_SUB_GRAPH',
     SetNodePosition = 'SET_NODE_POSITION',
     SetComment = 'SET_COMMENT',
+    SetTerraform = 'SET_TERRAFORM',
 
     // server diagram with icon response
     AddNodeAWS = 'ADD_NODE_AWS',
@@ -48,9 +51,10 @@ export enum WSEvent {
     SetNodePositionAWS = 'SET_NODE_POSITION_AWS',
     SetCommentAWS = 'SET_COMMENT_AWS',
     ResetAWS = 'RESET_AWS',
+    SetTerraformAWS = 'SET_TERRAFORM_AWS',
 }
 
-export type MessageData = string | Prompt | Vertex | Link | SubGraph | GenerateIcon
+export type MessageData = string | Prompt | Vertex | Link | SubGraph | SystemTypeDTO
 
 export interface Message<T extends MessageData> {
     event: WSEvent
@@ -67,6 +71,6 @@ export interface EditNode {
     title?: string | Vertex | Link | SubGraph
 }
 
-export interface GenerateIcon {
-    type: IconType
+export interface SystemTypeDTO {
+    type: SystemType
 }
