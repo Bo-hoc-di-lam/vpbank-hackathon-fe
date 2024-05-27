@@ -1,14 +1,15 @@
-import { ActionIcon, AppShell, Group, Image, Title } from "@mantine/core"
-import { useDisclosure, useDocumentTitle } from "@mantine/hooks"
-import { IconMessageCircle, IconX } from "@tabler/icons-react"
-import { Sidebar } from "./sidebar"
-import { Link } from "react-router-dom"
-import { ChatAside } from "./aside"
+import { ActionIcon, AppShell, Group, Image, Title } from "@mantine/core";
+import { useDocumentTitle } from "@mantine/hooks";
+import { IconMessageCircle, IconX } from "@tabler/icons-react";
+import { Sidebar } from "./sidebar";
+import { Link } from "react-router-dom";
+import { ChatAside } from "./aside";
+import { useAppShell, useNav, useSide } from "@/store/app-shell-store";
 
 interface DiagramLayoutProps {
-    title?: string
-    sidebar?: boolean
-    children?: React.ReactNode
+    title?: string;
+    sidebar?: boolean;
+    children?: React.ReactNode;
 }
 
 export function DiagramLayout({
@@ -16,11 +17,13 @@ export function DiagramLayout({
     sidebar = true,
     children,
 }: DiagramLayoutProps) {
-    const [sidebarOpened, { open: openSidebar, close: closeSidebar }] =
-        useDisclosure(false)
-    const [chatOpened, { toggle: toggleChat }] = useDisclosure(true)
+    const [showed] = useAppShell();
 
-    useDocumentTitle(title)
+    const [navOpened] = useNav();
+
+    const [chatOpened, { toggle: toggleChat }] = useSide();
+
+    useDocumentTitle(title);
 
     return (
         <>
@@ -29,7 +32,7 @@ export function DiagramLayout({
                 navbar={{
                     width: 300,
                     breakpoint: "sm",
-                    collapsed: { desktop: !sidebarOpened, mobile: true },
+                    collapsed: { desktop: !navOpened, mobile: true },
                 }}
                 aside={{
                     width: 500,
@@ -38,6 +41,7 @@ export function DiagramLayout({
                 }}
                 padding="md"
                 className="h-full"
+                disabled={!showed}
             >
                 <AppShell.Header>
                     <Group h="100%" px="md">
@@ -49,13 +53,8 @@ export function DiagramLayout({
                         </Link>
                     </Group>
                 </AppShell.Header>
-                {sidebar && (
-                    <Sidebar
-                        openSidebar={openSidebar}
-                        closeSidebar={closeSidebar}
-                    />
-                )}
-                <AppShell.Main ml={60} className="h-full">
+                {sidebar && <Sidebar />}
+                <AppShell.Main ml={showed ? 60 : 0} className="h-full">
                     {children}
                 </AppShell.Main>
                 <AppShell.Aside p="md">
@@ -78,7 +77,7 @@ export function DiagramLayout({
                 </AppShell.Aside>
             </AppShell>
         </>
-    )
+    );
 }
 
-export default DiagramLayout
+export default DiagramLayout;

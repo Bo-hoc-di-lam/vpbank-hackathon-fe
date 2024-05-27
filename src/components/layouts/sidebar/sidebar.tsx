@@ -1,20 +1,21 @@
-import { ActionIcon, AppShell, Stack, Title, Tooltip } from "@mantine/core"
-import { IconEdit, IconChartBar, IconCode, IconDoor } from "@tabler/icons-react"
-import { useMemo, useState } from "react"
-import { ManualEdit, ViewMermaid, AWSAction, Room } from "./sidebar-items"
-
-interface SidebarProps {
-    openSidebar: () => void
-    closeSidebar: () => void
-}
+import { ActionIcon, AppShell, Stack, Title, Tooltip } from "@mantine/core";
+import {
+    IconEdit,
+    IconChartBar,
+    IconCode,
+    IconDoor,
+} from "@tabler/icons-react";
+import { useMemo, useState } from "react";
+import { ManualEdit, ViewMermaid, AWSAction, Room } from "./sidebar-items";
+import { useAppShell, useNav } from "@/store/app-shell-store";
 
 interface SidebarItem {
-    icon: React.ReactNode
-    label: string
-    chilren: React.ReactNode
+    icon: React.ReactNode;
+    label: string;
+    chilren: React.ReactNode;
 }
 
-const Sidebar = ({ openSidebar, closeSidebar }: SidebarProps) => {
+const Sidebar = () => {
     const sidebarItems = useMemo<SidebarItem[]>(() => {
         return [
             {
@@ -37,49 +38,61 @@ const Sidebar = ({ openSidebar, closeSidebar }: SidebarProps) => {
                 label: "Generate AWS Service",
                 chilren: <AWSAction />,
             },
-        ]
-    }, [])
+        ];
+    }, []);
 
-    const [activeItem, setActiveItem] = useState<SidebarItem | null>(null)
+    const [_, { open: openNav, close: closeNav }] = useNav();
+
+    const [appShellShowed] = useAppShell();
+
+    const [activeItem, setActiveItem] = useState<SidebarItem | null>(null);
 
     const handleActiveItem = (item: SidebarItem) => {
         if (activeItem === item) {
-            setActiveItem(null)
-            closeSidebar()
-            return
+            setActiveItem(null);
+            closeNav();
+            return;
         }
-        setActiveItem(item)
-        openSidebar()
-    }
+        setActiveItem(item);
+        openNav();
+    };
 
     return (
         <>
-            <div className="fixed top-[60px] left-0 bottom-0 bg-white w-[60px] z-20 p-4 border-r border-[#dee2e6]">
-                <Stack gap={16}>
-                    {sidebarItems.map((item, index) => (
-                        <Tooltip
-                            key={index}
-                            label={item.label}
-                            position="right"
-                            withArrow
-                            disabled={activeItem === item}
-                        >
-                            <ActionIcon
-                                aria-label={item.label}
-                                onClick={() => handleActiveItem(item)}
-                                variant={
-                                    activeItem === item
-                                        ? "filled"
-                                        : "transparent"
-                                }
+            {appShellShowed && (
+                <div className="fixed top-[60px] left-0 bottom-0 bg-white w-[60px] z-20 p-4 border-r border-[#dee2e6]">
+                    <Stack gap={16}>
+                        {sidebarItems.map((item, index) => (
+                            <Tooltip
+                                key={index}
+                                label={item.label}
+                                position="right"
+                                withArrow
+                                disabled={activeItem === item}
                             >
-                                {item.icon}
-                            </ActionIcon>
-                        </Tooltip>
-                    ))}
-                </Stack>
-            </div>
-            <AppShell.Navbar p="md" zIndex="10" ml={60} className="overflow-y-auto">
+                                <ActionIcon
+                                    aria-label={item.label}
+                                    onClick={() => handleActiveItem(item)}
+                                    variant={
+                                        activeItem === item
+                                            ? "filled"
+                                            : "transparent"
+                                    }
+                                >
+                                    {item.icon}
+                                </ActionIcon>
+                            </Tooltip>
+                        ))}
+                    </Stack>
+                </div>
+            )}
+
+            <AppShell.Navbar
+                p="md"
+                zIndex="10"
+                ml={60}
+                className="overflow-y-auto"
+            >
                 <AppShell.Section>
                     <Title order={4}>{activeItem?.label}</Title>
                 </AppShell.Section>
@@ -88,7 +101,7 @@ const Sidebar = ({ openSidebar, closeSidebar }: SidebarProps) => {
                 </AppShell.Section>
             </AppShell.Navbar>
         </>
-    )
-}
+    );
+};
 
-export default Sidebar
+export default Sidebar;

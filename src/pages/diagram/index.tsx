@@ -15,13 +15,17 @@ import { nodeTypes } from "../../nodes";
 import { edgeTypes } from "../../edges";
 import { useRemoveLogo } from "../../hooks";
 import { useWtf } from "@/hooks/use-wtf";
-import {
-    useDiagramManager,
-} from "@/store/digaram-mananger-store";
+import { useDiagramManager } from "@/store/digaram-mananger-store";
 import toast from "react-hot-toast";
-import { Button, Indicator } from "@mantine/core";
-import { IconUser, IconUsers } from "@tabler/icons-react";
-import { useClipboard } from "@mantine/hooks";
+import { ActionIcon, Button, Indicator, Tooltip } from "@mantine/core";
+import {
+    IconMaximize,
+    IconMinimize,
+    IconUser,
+    IconUsers,
+} from "@tabler/icons-react";
+import { useClipboard, useFullscreen } from "@mantine/hooks";
+import { useAppShell } from "@/store/app-shell-store";
 
 const elk = new ELK();
 
@@ -241,6 +245,14 @@ const DiagramPage = () => {
         toast.success("Copied");
     };
 
+    const [appShellShowed, { toggle: toggleAppShell }] = useAppShell();
+    const { toggle: toggleFullScreen } = useFullscreen();
+
+    const handleToggleAppShell = () => {
+        toggleAppShell();
+        toggleFullScreen();
+    };
+
     return (
         <ReactFlow
             nodes={nodes}
@@ -280,6 +292,15 @@ const DiagramPage = () => {
                     </Indicator>
                     <span className="pl-2">{nameplate}</span>
                 </Button>
+            </Panel>
+            <Panel position="bottom-right">
+                <ActionIcon radius={"xl"} onClick={handleToggleAppShell}>
+                    {appShellShowed ? (
+                        <IconMaximize size={16} />
+                    ) : (
+                        <IconMinimize size={16} />
+                    )}
+                </ActionIcon>
             </Panel>
         </ReactFlow>
     );
