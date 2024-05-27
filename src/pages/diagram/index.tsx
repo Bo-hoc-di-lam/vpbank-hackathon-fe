@@ -158,7 +158,7 @@ const getLayoutedElements = async (nodes, edges, subGraphs, options) => {
 
 const DiagramPage = () => {
     useRemoveLogo();
-    useWtf();
+    // useWtf();
 
     const { fitView } = useReactFlow();
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
