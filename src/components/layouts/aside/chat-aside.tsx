@@ -123,38 +123,36 @@ const ChatAside = () => {
                 </ScrollArea>
             </AppShell.Section>
             <AppShell.Section>
-                <form onSubmit={handleChat}>
-                    <Group pt={16} align="end">
-                        <Textarea
-                            className="grow"
-                            placeholder="Chat with AI here"
-                            autosize
-                            minRows={1}
-                            maxRows={10}
-                            onChange={(e) => setChat(e.currentTarget.value)}
-                            value={chat}
-                            disabled={messaging}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter" && !e.shiftKey) {
-                                    e.preventDefault()
-                                    handleChat()
-                                }
-                            }}
-                        />
-                        <ActionIcon
-                            aria-label="Send message"
-                            size="lg"
-                            disabled={messaging}
-                            type="submit"
-                        >
-                            {messaging ? (
-                                <Loader size="sm" />
-                            ) : (
-                                <IconSend size={20} />
-                            )}
-                        </ActionIcon>
-                    </Group>
-                </form>
+                <Group pt={16} align="end">
+                    <Textarea
+                        className="grow"
+                        placeholder="Chat with AI here"
+                        autosize
+                        minRows={1}
+                        maxRows={10}
+                        onChange={(e) => setChat(e.currentTarget.value)}
+                        value={chat}
+                        disabled={messaging}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter" && !e.shiftKey) {
+                                e.preventDefault()
+                                handleChat()
+                            }
+                        }}
+                    />
+                    <ActionIcon
+                        aria-label="Send message"
+                        size="lg"
+                        disabled={messaging}
+                        onClick={handleChat}
+                    >
+                        {messaging ? (
+                            <Loader size="sm" />
+                        ) : (
+                            <IconSend size={20} />
+                        )}
+                    </ActionIcon>
+                </Group>
             </AppShell.Section>
         </>
     )

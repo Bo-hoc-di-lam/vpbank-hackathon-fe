@@ -38,7 +38,7 @@ const Sidebar = () => {
             },
             {
                 icon: <IconCode size={24} />,
-                label: "Generate AWS Service",
+                label: "Generate Tools",
                 chilren: <AWSAction />,
             },
         ]
