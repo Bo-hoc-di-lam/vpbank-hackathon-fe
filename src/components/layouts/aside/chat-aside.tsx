@@ -8,9 +8,9 @@ import {
     Loader,
 } from "@mantine/core"
 import { IconSend } from "@tabler/icons-react"
-import { createContext, useEffect, useRef, useState } from "react"
-import ReactMarkdown from 'react-markdown'
-import toast from 'react-hot-toast';
+import { useEffect, useRef, useState } from "react"
+import ReactMarkdown from "react-markdown"
+import toast from "react-hot-toast"
 import { useReactFlow } from "reactflow"
 
 interface Message {
@@ -20,7 +20,7 @@ interface Message {
 
 const ChatAside = () => {
     const [conversation, setConversation] = useState<Message[]>([
-        { role: "bot", message: "Hi, how can I help you?" }
+        { role: "bot", message: "Hi, how can I help you?" },
     ])
     const [chat, setChat] = useState<string>("")
     const [messaging, setMessaging] = useState<boolean>(false)
@@ -39,72 +39,72 @@ const ChatAside = () => {
 
     const diagramManager = useDiagramManager()
 
-    const handleChat = (prompt: string) => {
-        if (prompt === "") {
-            toast.error('Please enter a message');
-            return;
+    const handleChat = () => {
+        if (chat === "") {
+            toast.error("Please enter a message")
+            return
         }
 
         // show toast loading
-        toast.loading('Generating diagram...');
+        toast.loading("Generating diagram...")
 
-        diagramManager.start(prompt);
-        setChat("");
-        setMessaging(true);
+        diagramManager.start(chat)
+        setChat("")
+        setMessaging(true)
 
         setConversation((prevConversation) => [
             ...prevConversation,
-            { role: "user", message: prompt },
+            { role: "user", message: chat },
             { role: "bot", message: "l" },
-        ]);
+        ])
 
-        scrollBottom();
-    };
+        scrollBottom()
+    }
 
     let AWSGenerating = false
     const handleAWSChat = () => {
         if (AWSGenerating) {
-            return;
+            return
         }
-        AWSGenerating = true;
-        setChat("");
-        setMessaging(true);
+        AWSGenerating = true
+        setChat("")
+        setMessaging(true)
 
         setConversation((prevConversation) => [
             ...prevConversation,
             { role: "bot", message: "l" },
-        ]);
+        ])
 
-        scrollBottom();
-    };
+        scrollBottom()
+    }
 
     useEffect(() => {
-        diagramManager.setHandleAWSChatCallback(handleAWSChat);
+        diagramManager.setHandleAWSChatCallback(handleAWSChat)
         diagramManager.onCommentChange((comment) => {
             if (comment !== "") {
                 setConversation((prevConversation) => {
-                    const newConversation = [...prevConversation];
+                    const newConversation = [...prevConversation]
                     newConversation[newConversation.length - 1] = {
                         role: "bot",
                         message: comment,
-                    };
-                    return newConversation;
-                });
-                scrollBottom();
+                    }
+                    return newConversation
+                })
+                scrollBottom()
             }
         })
 
         diagramManager.onDone(() => {
             // hide toast loading
-            toast.dismiss();
-            setMessaging(false);
+            toast.dismiss()
+            setMessaging(false)
             // setConversation((prevConversation) => [
             //     ...prevConversation,
             //     { role: "bot", message: "Done" },
             // ]);
-            scrollBottom();
-            reactFlow.fitView();
-            toast.success('Done!');
+            scrollBottom()
+            reactFlow.fitView()
+            toast.success("Done!")
         })
     }, [])
 
@@ -123,26 +123,38 @@ const ChatAside = () => {
                 </ScrollArea>
             </AppShell.Section>
             <AppShell.Section>
-                <Group pt={16} align="end">
-                    <Textarea
-                        className="grow"
-                        placeholder="Chat with AI here"
-                        autosize
-                        minRows={1}
-                        maxRows={10}
-                        onChange={(e) => setChat(e.currentTarget.value)}
-                        value={chat}
-                        disabled={messaging}
-                    />
-                    <ActionIcon
-                        aria-label="Send message"
-                        size="lg"
-                        onClick={() => handleChat(chat)}
-                        disabled={messaging}
-                    >
-                        {messaging ? <Loader size="sm" /> : <IconSend size={20} />}
-                    </ActionIcon>
-                </Group>
+                <form onSubmit={handleChat}>
+                    <Group pt={16} align="end">
+                        <Textarea
+                            className="grow"
+                            placeholder="Chat with AI here"
+                            autosize
+                            minRows={1}
+                            maxRows={10}
+                            onChange={(e) => setChat(e.currentTarget.value)}
+                            value={chat}
+                            disabled={messaging}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && !e.shiftKey) {
+                                    e.preventDefault()
+                                    handleChat()
+                                }
+                            }}
+                        />
+                        <ActionIcon
+                            aria-label="Send message"
+                            size="lg"
+                            disabled={messaging}
+                            type="submit"
+                        >
+                            {messaging ? (
+                                <Loader size="sm" />
+                            ) : (
+                                <IconSend size={20} />
+                            )}
+                        </ActionIcon>
+                    </Group>
+                </form>
             </AppShell.Section>
         </>
     )
