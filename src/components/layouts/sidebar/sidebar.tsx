@@ -50,10 +50,14 @@ const Sidebar = () => {
 
     const [activeItem, setActiveItem] = useState<SidebarItem | null>(null)
 
+    const handleCloseNav = () => {
+        setActiveItem(null)
+        closeNav()
+    }
+
     const handleActiveItem = (item: SidebarItem) => {
         if (activeItem === item) {
-            setActiveItem(null)
-            closeNav()
+            handleCloseNav()
             return
         }
         setActiveItem(item)
@@ -99,7 +103,7 @@ const Sidebar = () => {
                 <AppShell.Section>
                     <Group justify="space-between">
                         <Title order={4}>{activeItem?.label}</Title>
-                        <CloseButton onClick={closeNav} />
+                        <CloseButton onClick={handleCloseNav} />
                     </Group>
                 </AppShell.Section>
                 <AppShell.Section my={"md"} grow>
