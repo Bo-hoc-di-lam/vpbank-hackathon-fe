@@ -1,20 +1,8 @@
 import { motion } from "framer-motion"
-import { useMemo } from "react"
 import { AuroraBackground } from "../components/ui/aurora-background"
-import { PlaceholdersAndVanishInput } from "../components/ui/placeholders-and-vanish-input"
 import { Button } from "@/components/ui/moving-border"
 import { Link } from "react-router-dom"
 export default function Home() {
-    const placeholders = useMemo(
-        () => [
-            "How to create a Netflix-like website",
-            "How to build a chat application",
-            "How to create a social media platform",
-            "How to build a banking application",
-        ],
-        []
-    )
-
     return (
         <AuroraBackground>
             <motion.div

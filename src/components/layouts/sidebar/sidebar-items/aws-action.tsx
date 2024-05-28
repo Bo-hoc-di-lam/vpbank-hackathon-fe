@@ -105,7 +105,7 @@ const AWSAction = () => {
                 variant="light"
                 rightSection={<IconBrandTerraform size={20} />}
                 onClick={() => {
-                    open()
+                    if (diagramManager.mermaid) open()
                     if (terraform === "") generateTerraform()
                 }}
                 // disabled={terraform === "" || generating}
@@ -123,7 +123,7 @@ const AWSAction = () => {
                     <Button
                         variant="light"
                         onClick={copyToClipboard}
-                        disabled={terraform === ""}
+                        disabled={terraform === "" || generating}
                     >
                         Copy to Clipboard
                         <IconCopy size={16} />
@@ -131,7 +131,7 @@ const AWSAction = () => {
                     <Button
                         variant="light"
                         onClick={exportToFile}
-                        disabled={terraform === ""}
+                        disabled={terraform === "" || generating}
                     >
                         Export to File
                         <IconFileExport size={16} />

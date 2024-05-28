@@ -2,11 +2,11 @@ import { DiagramManager } from "@/diagram/manager"
 import { create } from "zustand"
 
 interface DiagramManagerStore {
-    diagramManager: DiagramManager
+    diagramManager: DiagramManager | null
 }
 
 export const useDiagramManagerStore = create<DiagramManagerStore>(() => ({
-    diagramManager: new DiagramManager(),
+    diagramManager: null,
 }))
 
 export type ExtractState<S> = S extends {
@@ -19,8 +19,10 @@ const diagramManagerSelector = (
     state: ExtractState<typeof useDiagramManagerStore>
 ) => state.diagramManager
 
-export const useDiagramManager = () =>
-    useDiagramManagerStore(diagramManagerSelector)
-
-export const getDiagramManager = () =>
-    diagramManagerSelector(useDiagramManagerStore.getState())
+export const useDiagramManager = () => {
+    const store = useDiagramManagerStore.getState()
+    if (!store.diagramManager) {
+        store.diagramManager = new DiagramManager()
+    }
+    return store.diagramManager
+}
