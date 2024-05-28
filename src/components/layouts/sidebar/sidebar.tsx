@@ -1,18 +1,21 @@
-import { ActionIcon, AppShell, Stack, Title, Tooltip } from "@mantine/core";
 import {
-    IconEdit,
-    IconChartBar,
-    IconCode,
-    IconDoor,
-} from "@tabler/icons-react";
-import { useMemo, useState } from "react";
-import { ManualEdit, ViewMermaid, AWSAction, Room } from "./sidebar-items";
-import { useAppShell, useNav } from "@/store/app-shell-store";
+    ActionIcon,
+    AppShell,
+    CloseButton,
+    Group,
+    Stack,
+    Title,
+    Tooltip,
+} from "@mantine/core"
+import { IconEdit, IconChartBar, IconCode, IconDoor } from "@tabler/icons-react"
+import { useMemo, useState } from "react"
+import { ManualEdit, ViewMermaid, AWSAction, Room } from "./sidebar-items"
+import { useAppShell, useNav } from "@/store/app-shell-store"
 
 interface SidebarItem {
-    icon: React.ReactNode;
-    label: string;
-    chilren: React.ReactNode;
+    icon: React.ReactNode
+    label: string
+    chilren: React.ReactNode
 }
 
 const Sidebar = () => {
@@ -38,24 +41,24 @@ const Sidebar = () => {
                 label: "Generate AWS Service",
                 chilren: <AWSAction />,
             },
-        ];
-    }, []);
+        ]
+    }, [])
 
-    const [_, { open: openNav, close: closeNav }] = useNav();
+    const [_, { open: openNav, close: closeNav }] = useNav()
 
-    const [appShellShowed] = useAppShell();
+    const [appShellShowed] = useAppShell()
 
-    const [activeItem, setActiveItem] = useState<SidebarItem | null>(null);
+    const [activeItem, setActiveItem] = useState<SidebarItem | null>(null)
 
     const handleActiveItem = (item: SidebarItem) => {
         if (activeItem === item) {
-            setActiveItem(null);
-            closeNav();
-            return;
+            setActiveItem(null)
+            closeNav()
+            return
         }
-        setActiveItem(item);
-        openNav();
-    };
+        setActiveItem(item)
+        openNav()
+    }
 
     return (
         <>
@@ -94,14 +97,17 @@ const Sidebar = () => {
                 className="overflow-y-auto"
             >
                 <AppShell.Section>
-                    <Title order={4}>{activeItem?.label}</Title>
+                    <Group justify="space-between">
+                        <Title order={4}>{activeItem?.label}</Title>
+                        <CloseButton onClick={closeNav} />
+                    </Group>
                 </AppShell.Section>
                 <AppShell.Section my={"md"} grow>
                     {activeItem?.chilren}
                 </AppShell.Section>
             </AppShell.Navbar>
         </>
-    );
-};
+    )
+}
 
-export default Sidebar;
+export default Sidebar
