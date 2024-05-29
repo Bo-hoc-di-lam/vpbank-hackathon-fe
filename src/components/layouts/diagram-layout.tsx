@@ -1,26 +1,29 @@
-import { ActionIcon, AppShell, Group, Image, Title } from "@mantine/core"
-import { useDisclosure, useDocumentTitle } from "@mantine/hooks"
-import { IconMessageCircle, IconX } from "@tabler/icons-react"
-import { Sidebar } from "./sidebar"
-import { Link } from "react-router-dom"
-import { ChatAside } from "./aside"
+import { ActionIcon, AppShell, Group, Image, Title } from "@mantine/core";
+import { useDocumentTitle } from "@mantine/hooks";
+import { IconMessageCircle, IconX } from "@tabler/icons-react";
+import { Sidebar } from "./sidebar";
+import { Link } from "react-router-dom";
+import { ChatAside } from "./aside";
+import { useAppShell, useNav, useSide } from "@/store/app-shell-store";
 
-interface MainLayoutProps {
-    title?: string
-    sidebar?: boolean
-    children?: React.ReactNode
+interface DiagramLayoutProps {
+    title?: string;
+    sidebar?: boolean;
+    children?: React.ReactNode;
 }
 
-export function MainLayout({
+export function DiagramLayout({
     title = "VPBank Hackathon | Team 100 | BHDL",
     sidebar = true,
     children,
-}: MainLayoutProps) {
-    const [sidebarOpened, { open: openSidebar, close: closeSidebar }] =
-        useDisclosure(false)
-    const [chatOpened, { toggle: toggleChat }] = useDisclosure(true)
+}: DiagramLayoutProps) {
+    const [showed] = useAppShell();
 
-    useDocumentTitle(title)
+    const [navOpened] = useNav();
+
+    const [chatOpened, { toggle: toggleChat }] = useSide();
+
+    useDocumentTitle(title);
 
     return (
         <>
@@ -29,7 +32,7 @@ export function MainLayout({
                 navbar={{
                     width: 300,
                     breakpoint: "sm",
-                    collapsed: { desktop: !sidebarOpened, mobile: true },
+                    collapsed: { desktop: !navOpened, mobile: true },
                 }}
                 aside={{
                     width: 500,
@@ -38,24 +41,20 @@ export function MainLayout({
                 }}
                 padding="md"
                 className="h-full"
+                disabled={!showed}
             >
                 <AppShell.Header>
                     <Group h="100%" px="md">
                         <Link to="/" className="flex gap-3 items-center">
-                            <Image src="/logo.png" alt="BHDL Logo" h={40} />
+                            <Image src="/logo.svg" alt="BHDL Logo" h={40} />
                             <Title order={5}>
                                 VPBank Hackathon | Team 100 | BHDL
                             </Title>
                         </Link>
                     </Group>
                 </AppShell.Header>
-                {sidebar && (
-                    <Sidebar
-                        openSidebar={openSidebar}
-                        closeSidebar={closeSidebar}
-                    />
-                )}
-                <AppShell.Main ml={60} className="h-full">
+                {sidebar && <Sidebar />}
+                <AppShell.Main ml={showed ? 60 : 0} className="h-full">
                     {children}
                 </AppShell.Main>
                 <AppShell.Aside p="md">
@@ -78,7 +77,7 @@ export function MainLayout({
                 </AppShell.Aside>
             </AppShell>
         </>
-    )
+    );
 }
 
-export default MainLayout
+export default DiagramLayout;

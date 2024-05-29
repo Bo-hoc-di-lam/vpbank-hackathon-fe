@@ -1,21 +1,8 @@
 import { motion } from "framer-motion"
-import React, { useMemo } from "react"
 import { AuroraBackground } from "../components/ui/aurora-background"
-import { useNavigate } from "react-router-dom"
-import { PlaceholdersAndVanishInput } from "../components/ui/placeholders-and-vanish-input"
-
+import { Button } from "@/components/ui/moving-border"
+import { Link } from "react-router-dom"
 export default function Home() {
-    const placeholders = useMemo(
-        () => [
-            "How to create a Netflix-like website",
-            "How to build a chat application",
-            "How to create a social media platform",
-            "How to build a banking application",
-        ],
-        []
-    )
-
-    const navigate = useNavigate()
     return (
         <AuroraBackground>
             <motion.div
@@ -35,16 +22,14 @@ export default function Home() {
                     Team 100 - BHDL
                 </div>
 
-                <PlaceholdersAndVanishInput
-                    placeholders={placeholders}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        console.log(e.target.value)
-                    }
-                    onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
-                        e.preventDefault()
-                        navigate("/diagram")
-                    }}
-                />
+                <Button
+                    as={Link}
+                    to="/diagram"
+                    borderRadius="1.75rem"
+                    className="bg-white dark:bg-slate-900 text-black dark:text-white border-neutral-200 dark:border-slate-800"
+                >
+                    Get Started
+                </Button>
             </motion.div>
         </AuroraBackground>
     )

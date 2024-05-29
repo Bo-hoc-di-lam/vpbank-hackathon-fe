@@ -1,41 +1,47 @@
 import type { Node, NodeTypes } from "reactflow"
-import { PositionLoggerNode } from "./PositionLoggerNode"
+import { StadiumShapedNode } from "./StadiumShapedNode"
+import { CircleNode } from "./CircleNode"
+import { RhombusNode } from "./RhombusNode"
+import { CommonNode } from "./CommonNode"
+import SubGraphNode from "./SubGraphNode"
+import { GroupShape } from "./GroupShape"
+import { CommonAWSNode } from "./CommonAWS"
 
 export const initialNodes = [
-    // Client node
-    { id: "A", position: { x: 0, y: 0 }, data: { label: "Product Page" } },
-
-    // API Gateway node
-    { id: "B", position: { x: 200, y: 0 }, data: { label: "API Gateway" } },
-
-    // API Gateway nodes
-    { id: "C", position: { x: 400, y: 100 }, data: { label: "Item API" } },
-    { id: "D", position: { x: 400, y: 50 }, data: { label: "Reviews API" } },
     {
-        id: "E",
-        position: { x: 400, y: 0 },
-        data: { label: "Recommendations API" },
+        id: "A",
+        type: "group",
+        data: { label: "Hello" },
+        position: { x: 0, y: 0 },
+        style: {
+            width: 400,
+            height: 300,
+        },
     },
-    { id: "F", position: { x: 400, y: -50 }, data: { label: "Auth API" } },
-    { id: "G", position: { x: 400, y: -100 }, data: { label: "Search API" } },
-
-    // Microservices database nodes
-    { id: "H", position: { x: 600, y: 100 }, data: { label: "Item API DB" } },
-    { id: "I", position: { x: 600, y: 50 }, data: { label: "Reviews API DB" } },
     {
-        id: "J",
-        position: { x: 600, y: 0 },
-        data: { label: "Recommendations API DB" },
+        id: "B",
+        type: "default",
+        data: { label: "child node 1" },
+        position: { x: 10, y: 10 },
+        parentNode: "A",
+        extent: "parent",
     },
-    { id: "K", position: { x: 600, y: -50 }, data: { label: "Auth API DB" } },
     {
-        id: "L",
-        position: { x: 600, y: -100 },
-        data: { label: "Search API DB" },
+        id: "C",
+        type: "circle",
+        data: { label: "child node 2" },
+        position: { x: 10, y: 90 },
+        parentNode: "A",
+        extent: "parent",
     },
 ] satisfies Node[]
 
 export const nodeTypes = {
-    "position-logger": PositionLoggerNode,
-    // Add any of your custom nodes here!
+    common: CommonNode,
+    "stadium-shaped": StadiumShapedNode,
+    circle: CircleNode,
+    rhombus: RhombusNode,
+    subgraph: SubGraphNode,
+    "custom-group": GroupShape,
+    "common-aws": CommonAWSNode,
 } satisfies NodeTypes
