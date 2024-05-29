@@ -1,22 +1,42 @@
 import { useDiagramManager } from "@/store/digaram-mananger-store"
 import { useClipboard, useDisclosure } from "@mantine/hooks"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { dracula } from "react-syntax-highlighter/dist/esm/styles/prism"
 import toast from "react-hot-toast"
-import { Button, Modal } from "@mantine/core"
+import { Button, Divider, Modal } from "@mantine/core"
 
-import { exportToMermaidFile } from "@/utils/file"
+import { exportToDrawIO, exportToMermaidFile } from "@/utils/file"
 import { IconCopy, IconFileExport } from "@tabler/icons-react"
+import { WSEvent } from "@/type/ws_data"
 
 const ViewMermaid = () => {
     const diagramManager = useDiagramManager()
     const [codeString, setCodeString] = useState<string>(diagramManager.mermaid)
-    const [modalOpened, { open, close }] = useDisclosure(false)
+    const [mermaidModalOpened, mermaidModal] = useDisclosure(false)
 
-    diagramManager.onMermaid((mermaid) => {
-        setCodeString(mermaid)
-    })
+
+    const genDrawIO = () => {
+        diagramManager.genDrawIO()
+    }
+    useEffect(() => {
+        diagramManager.onDone((data) => {
+            console.log("mermaid", data)
+            if (data.event !== WSEvent.GenerateDrawIO) {
+                console.log("not gen")
+                return
+            }
+            exportToDrawIO(diagramManager.drawIO)
+            toast.success("DrawIO exported successfully")
+        })
+
+        diagramManager.onMermaid((mermaid) => {
+            setCodeString(mermaid)
+        })
+
+    }, [])
+
+
 
     const clipboard = useClipboard({ timeout: 500 })
 
@@ -47,8 +67,8 @@ const ViewMermaid = () => {
     return (
         <div className="flex flex-col gap-4">
             <Modal
-                opened={modalOpened}
-                onClose={close}
+                opened={mermaidModalOpened}
+                onClose={mermaidModal.close}
                 title="Mermaid"
                 size="100%"
             >
@@ -87,12 +107,21 @@ const ViewMermaid = () => {
             <Button
                 fullWidth
                 variant="light"
-                onClick={open}
+                onClick={mermaidModal.open}
                 disabled={codeString === ""}
             >
                 {codeString === ""
                     ? "Please generate first to view"
                     : "View Mermaid Code"}
+            </Button>
+            <Divider />
+            <Button
+                fullWidth
+                variant="light"
+                onClick={genDrawIO}
+                disabled={codeString === ""}
+            >
+                Generate DrawIO
             </Button>
         </div>
     )

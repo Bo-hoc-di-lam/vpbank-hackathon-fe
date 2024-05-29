@@ -1,5 +1,5 @@
 import { useDiagramManager } from "@/store/digaram-mananger-store"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { Button, Card, Divider, Modal } from "@mantine/core"
 import {
@@ -19,13 +19,17 @@ const AWSAction = () => {
     const [terraform, setTerraform] = useState<string>(diagramManager.terraform)
     const [generating, setGenerating] = useState<boolean>(false)
 
-    diagramManager.onTerraform((terraform) => {
-        setTerraform(terraform)
-    })
+    useEffect(() => {
+        diagramManager.onTerraform((terraform) => {
+            setTerraform(terraform)
+        })
 
-    diagramManager.onDone(() => {
-        setGenerating(false)
-    })
+        diagramManager.onDone(() => {
+            setGenerating(false)
+        })
+
+
+    }, [])
 
     const generateTerraform = () => {
         setGenerating(true)
@@ -108,7 +112,7 @@ const AWSAction = () => {
                     if (diagramManager.mermaid) open()
                     if (terraform === "") generateTerraform()
                 }}
-                // disabled={terraform === "" || generating}
+            // disabled={terraform === "" || generating}
             >
                 {/* {terraform === "" ? "Please generate first to view" : "View Terraform Code"} */}
                 Generate Terraform Code

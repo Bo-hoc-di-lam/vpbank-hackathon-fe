@@ -22,6 +22,7 @@ export enum WSEvent {
     JoinRoom = 'JOIN_ROOM',
     GenerateCode = 'GENERATE_CODE',
     Ping = 'PING',
+    GenerateDrawIO = 'GENERATE_DRAWIO',
 
 
     // server diagram response
@@ -37,6 +38,7 @@ export enum WSEvent {
     SetNodePosition = 'SET_NODE_POSITION',
     SetComment = 'SET_COMMENT',
     SetTerraform = 'SET_TERRAFORM',
+    SetDrawIO = "SET_DRAWIO",
 
     // server diagram with icon response
     AddNodeAWS = 'ADD_NODE_AWS',

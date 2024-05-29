@@ -21,6 +21,7 @@ interface WSEventMap {
     [WSEvent.GenerateIcon]: MessageCallback<SystemTypeDTO>
     [WSEvent.JoinRoom]: MessageCallback<string>
     [WSEvent.GenerateCode]: MessageCallback<SystemTypeDTO>
+    [WSEvent.GenerateDrawIO]: MessageCallback<any>
 
     // server diagram response
     [WSEvent.AddNode]: MessageCallback<Vertex>
@@ -35,6 +36,7 @@ interface WSEventMap {
     [WSEvent.SetNodePosition]: MessageCallback<Vertex>
     [WSEvent.SetComment]: MessageCallback<string>
     [WSEvent.SetTerraform]: MessageCallback<string>
+    [WSEvent.SetDrawIO]: MessageCallback<string>
 
     // server diagram with custom icon response
     [WSEvent.AddNodeAWS]: MessageCallback<Vertex>
@@ -103,6 +105,14 @@ export class WSClient {
         this.sendMessage(data)
     }
 
+    public generateDrawIO() {
+        const data: Message<any> = {
+            event: WSEvent.GenerateDrawIO,
+            data: null,
+        }
+        this.sendMessage(data)
+    }
+
     public generateIcon(systemType: SystemType) {
         const data: Message<SystemTypeDTO> = {
             event: WSEvent.GenerateIcon,
@@ -110,7 +120,7 @@ export class WSClient {
                 type: systemType
             }
         }
-        this.ws.send(JSON.stringify(data))
+        this.sendMessage(data)
     }
 
     public generateTerraform(systemType: SystemType) {
@@ -120,7 +130,7 @@ export class WSClient {
                 type: systemType
             }
         }
-        this.ws.send(JSON.stringify(data))
+        this.sendMessage(data)
     }
 
 
