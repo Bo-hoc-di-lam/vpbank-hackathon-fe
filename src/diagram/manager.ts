@@ -16,16 +16,19 @@ export class DiagramManager {
     public needRerender: boolean = false
     public comment: string = ""
     public mermaid: string = ""
+    public mermaidAWS: string = ""
     public nameplate: string = ""
     public userCounter: number = 0
     public terraform: string = ""
+    public drawIO: string = ""
 
     private onUserCounterChangeHandlers: ((count: number) => void)[] = []
     private onRoomInfoHandlers: ((nameplate: string) => void)[] = []
     private onCommentChangeHandlers: ((comment: string) => void)[] = []
-    private onDoneHandlers: (() => void)[] = []
+    private onDoneHandlers: ((data: any) => void)[] = []
     private onMermaidHandlers: ((mermaid: string) => void)[] = []
     private onTerraformHandlers: ((terraform: string) => void)[] = []
+    private onDrawIOHandlers: ((drawIO: string) => void)[] = []
     private renderFunc: () => void
     private intervalTime: number = 0.5 * 1000
     public interval: NodeJS.Timeout | null = null
@@ -41,6 +44,15 @@ export class DiagramManager {
 
     constructor() {
         this.ws = new WSClient()
+
+        this.ws.on(WSEvent.SetDrawIO, (data: string) => {
+            this.drawIO += data
+            if (this.onDrawIOHandlers) {
+                this.onDrawIOHandlers.forEach(handler => {
+                    handler(this.drawIO)
+                })
+            }
+        })
 
         this.ws.on(WSEvent.SetTerraformAWS, (data: string) => {
             this.terraform += data
@@ -182,7 +194,7 @@ export class DiagramManager {
         //     });
         // });
 
-        this.ws.on(WSEvent.Done, () => {
+        this.ws.on(WSEvent.Done, (data) => {
             this.started = true
             // clear interval
             if (this.interval) {
@@ -197,7 +209,7 @@ export class DiagramManager {
 
             if (this.onDoneHandlers) {
                 this.onDoneHandlers.forEach(handler => {
-                    handler()
+                    handler(data)
                 })
             }
         });
@@ -240,6 +252,13 @@ export class DiagramManager {
         this.ws.generateIcon(SystemType.AWS)
     }
 
+    public genDrawIO() {
+        this.isGenerating = true
+        this.drawIO = ""
+        this.resetInterval()
+        this.ws.generateDrawIO()
+    }
+
     public genTerraform() {
         if (!this.mermaid) return
         this.terraform = ""
@@ -258,6 +277,10 @@ export class DiagramManager {
         this.ws.sendEditPrompt(query, vertex)
     }
 
+    public onDrawIO(handler: (drawIO: string) => void) {
+        this.onDrawIOHandlers.push(handler)
+    }
+
     public onTerraform(handler: (terraform: string) => void) {
         this.onTerraformHandlers.push(handler)
     }
@@ -270,7 +293,7 @@ export class DiagramManager {
         this.onCommentChangeHandlers.push(handler)
     }
 
-    public onDone(handler: () => void) {
+    public onDone(handler: (data: any) => void) {
         this.onDoneHandlers.push(handler)
     }
 
