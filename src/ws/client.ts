@@ -4,7 +4,7 @@ import { Message, WSEvent, Prompt, MessageData, EditNode, SystemTypeDTO, SystemT
 
 type MessageCallback<T extends MessageData> = (msg: T) => void
 
-interface WSEventMap {
+export interface WSEventMap {
     // info
     [WSEvent.Error]: MessageCallback<string>
     [WSEvent.UserJoined]: MessageCallback<string>

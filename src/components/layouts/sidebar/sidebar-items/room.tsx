@@ -1,8 +1,8 @@
 import { useDiagramManager } from "@/store/digaram-mananger-store";
+import { WSEvent } from "@/type/ws_data";
 import { ActionIcon, Button, CopyButton, Input, TextInput, Tooltip } from "@mantine/core";
 import { IconCheck, IconCopy, IconDoor } from "@tabler/icons-react";
 import { useState } from "react";
-import toast from "react-hot-toast";
 
 
 
@@ -14,7 +14,7 @@ const Room = () => {
 
     const [currentNameplate, setCurrentNameplate] = useState<string>(diagramManager.nameplate);
 
-    diagramManager.onRoomInfo((roomToJoin) => {
+    diagramManager.on(WSEvent.RoomInfo, (roomToJoin: string) => {
         setCurrentNameplate(roomToJoin);
         if (roomToJoin === nameplate) {
             setNameplate("");
