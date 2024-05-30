@@ -1,12 +1,20 @@
 import { useDiagramManager } from "@/store/digaram-mananger-store"
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
-import { Button, Card, Divider, Modal } from "@mantine/core"
+import {
+    ActionIcon,
+    Button,
+    ButtonGroup,
+    Card,
+    Divider,
+    Modal,
+} from "@mantine/core"
 import {
     IconBrandAws,
     IconBrandTerraform,
     IconCopy,
     IconFileExport,
+    IconReload,
 } from "@tabler/icons-react"
 import { useClipboard, useDisclosure } from "@mantine/hooks"
 import { dracula } from "react-syntax-highlighter/dist/esm/styles/prism"
@@ -142,6 +150,7 @@ const TerraFormModal = ({
         exportToTerraform(terraform)
         toast.success("File exported successfully")
     }
+
     return (
         <>
             <div className="flex gap-4">
@@ -213,6 +222,7 @@ const TerraformAction = () => {
 
         if (terraform === "") {
             generateTerraform()
+            return
         }
 
         modals.open({
@@ -225,14 +235,19 @@ const TerraformAction = () => {
     }
 
     return (
-        <Button
-            fullWidth
-            variant="light"
-            rightSection={<IconBrandTerraform size={20} />}
-            onClick={handleOpen}
-        >
-            Generate Terraform Code
-        </Button>
+        <Button.Group>
+            <Button
+                fullWidth
+                variant="light"
+                rightSection={<IconBrandTerraform size={20} />}
+                onClick={handleOpen}
+            >
+                Terraform Code
+            </Button>
+            <Button disabled={terraform === ""}>
+                <IconReload size={20} onClick={generateTerraform} />
+            </Button>
+        </Button.Group>
     )
 }
 
