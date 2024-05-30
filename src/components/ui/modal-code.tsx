@@ -41,28 +41,34 @@ export const ModalCode = ({
             <Modal
                 opened={opened}
                 onClose={handler.close}
+                withCloseButton={false}
                 size={modalSize}
-                title={title}
             >
-                <div className="flex gap-2 pb-2">
-
-                    <CopyButton value={data}>
-                        {
-                            ({ copied, copy }) => (
-                                <Button
-                                    variant="light"
-                                    onClick={copy}
-                                    disabled={data === "" || !data}
-                                >
-                                    {copied ? "Copied to clipboard" : "Copy to clipboard"}
-                                </Button>
-                            )
-                        }
-                    </CopyButton>
-                    <Button disabled={data === "" || !data} variant="light" onClick={exportToFile}>
-                        Export to file
-                    </Button>
-                </div>
+                <Modal.Header>
+                    <div className="w-full">
+                        <div className="flex justify-center">
+                            <b>{title}</b>
+                        </div>
+                        <div className="flex gap-2  sticky top-0">
+                            <CopyButton value={data}>
+                                {
+                                    ({ copied, copy }) => (
+                                        <Button
+                                            variant="light"
+                                            onClick={copy}
+                                            disabled={data === "" || !data}
+                                        >
+                                            {copied ? "Copied to clipboard" : "Copy to clipboard"}
+                                        </Button>
+                                    )
+                                }
+                            </CopyButton>
+                            <Button disabled={data === "" || !data} variant="light" onClick={exportToFile}>
+                                Export to file
+                            </Button>
+                        </div>
+                    </div>
+                </Modal.Header>
                 <SyntaxHighlighter language={language} wrapLines lineProps={{
                     style: {
                         wordBreak: "break-all",
