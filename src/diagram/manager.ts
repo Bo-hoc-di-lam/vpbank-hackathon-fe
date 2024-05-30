@@ -4,7 +4,7 @@ import { Vertex } from "@/type/diagram"
 import { SystemType, WSEvent } from "@/type/ws_data"
 import { WSClient } from "@/ws/client"
 import { title } from "process"
-import { Node, Edge } from "reactflow"
+import { Node, Edge, MarkerType } from "reactflow"
 import { convertIconName } from "@/utils/aws-icon"
 export class DiagramManager {
     public nodes: Node<any>[] = []
@@ -125,6 +125,9 @@ export class DiagramManager {
                 source: data.from_id,
                 target: data.to_id,
                 label: data.text,
+                markerEnd: {
+                    type: MarkerType.ArrowClosed
+                },
                 data: {
                     label: data.text,
                 }
@@ -151,6 +154,9 @@ export class DiagramManager {
                 id: data.id,
                 source: data.from_id,
                 target: data.to_id,
+                markerEnd: {
+                    type: MarkerType.ArrowClosed
+                },
                 data: {
                     label: data.text,
                 }

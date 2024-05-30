@@ -48,7 +48,7 @@ const createGraph = (nodes, edges, subGraphs, options) => {
                     ...node,
                     targetPosition: isHorizontal ? "left" : "top",
                     sourcePosition: isHorizontal ? "right" : "bottom",
-                    width: 150,
+                    width: 200,
                     height: 50,
                     ...createSubGraph(node, allNodes, allEdges), // Recurse into subgraphs
                 }))
@@ -76,7 +76,7 @@ const createGraph = (nodes, edges, subGraphs, options) => {
                 ...node,
                 targetPosition: isHorizontal ? "left" : "top",
                 sourcePosition: isHorizontal ? "right" : "bottom",
-                width: 150,
+                width: 200,
                 height: 50,
                 ...createSubGraph(node, nodes, edges), // Recurse into subgraphs
             }))

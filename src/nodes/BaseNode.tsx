@@ -3,7 +3,7 @@ import {
     useSelectedNodeStore,
 } from "@/store/selected-node-store";
 import { cn } from "@/utils/cn";
-import { ActionIcon, Group, Tooltip } from "@mantine/core";
+import { ActionIcon, Group, Stack, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {
     IconCheck,
@@ -109,9 +109,9 @@ const BaseNode = ({
 
     return (
         <>
-            <NodeToolbar position={Position.Top} offset={10} align="end">
+            <NodeToolbar position={Position.Right} offset={10} align="center">
                 {editMode ? (
-                    <Group gap={4}>
+                    <Stack gap={4} bg="white">
                         <Tooltip label="Save">
                             <ActionIcon
                                 variant="light"
@@ -130,9 +130,9 @@ const BaseNode = ({
                                 <IconX />
                             </ActionIcon>
                         </Tooltip>
-                    </Group>
+                    </Stack>
                 ) : (
-                    <Group gap={4}>
+                    <Stack gap={4} bg="white">
                         <Tooltip label="Edit">
                             <ActionIcon
                                 variant="light"
@@ -168,29 +168,32 @@ const BaseNode = ({
                                 <IconTrash />
                             </ActionIcon>
                         </Tooltip>
-                    </Group>
+                    </Stack>
                 )}
             </NodeToolbar>
+
             <div
                 className={cn(
-                    ` ${selected ? "border-2" : "border"} ${
-                        isNodeSelected ? "border-green-600" : "border-black"
-                    } bg-white flex items-center justify-center ${
-                        iconExist ? "px-1 py-2.5" : "p-2.5"
-                    }`,
+                    ` 
+                    w-auto h-auto p-1
+                    transition-all duration-150 shadow-md
+                    bg-white flex items-center justify-center border border-slate-500
+                    ${(selected || isNodeSelected) && "border-green-600 scale-110 border-2"}
+                      `,
                     className
+
                 )}
             >
-                <div className="flex items-center w-full">
-                    <div>
-                        {iconExist && (
+                <div className="flex items-center w-full h-full gap-1">
+                    {iconExist && (
+                        <div className="flex-shrink-0">
                             <img
                                 src={`https://app.eraser.io/static/canvas-icons/${icon}.svg`}
                                 alt={icon}
-                                className="w-8 h-8"
+                                className=" w-auto h-10 rounded-sm"
                             />
-                        )}
-                    </div>
+                        </div>
+                    )}
                     <div className="flex-grow text-center text-xs">
                         {label && (
                             <div className={cn(labelClassName)}>
