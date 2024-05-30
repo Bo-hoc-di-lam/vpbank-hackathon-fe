@@ -1,18 +1,18 @@
 import { useDiagramManager } from "@/store/digaram-mananger-store"
+import { WSEvent } from "@/type/ws_data"
 import {
     ActionIcon,
     AppShell,
     Group,
+    Loader,
     ScrollArea,
     Textarea,
-    Loader,
 } from "@mantine/core"
 import { IconSend } from "@tabler/icons-react"
-import { useEffect, useRef, useState } from "react"
-import ReactMarkdown from "react-markdown"
+import React, { useEffect, useRef, useState } from "react"
 import toast from "react-hot-toast"
+import ReactMarkdown from "react-markdown"
 import { useReactFlow } from "reactflow"
-import { WSEvent } from "@/type/ws_data"
 
 interface Message {
     role: string
@@ -207,4 +207,4 @@ const ChatUi = ({ role, message }: Message) => {
     }
 }
 
-export default ChatAside
+export default React.memo(ChatAside)

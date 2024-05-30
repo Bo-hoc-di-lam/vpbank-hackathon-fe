@@ -1,10 +1,10 @@
+import { useAppShell, useNav, useSide } from "@/store/app-shell-store";
 import { ActionIcon, AppShell, Group, Image, Title } from "@mantine/core";
 import { useDocumentTitle } from "@mantine/hooks";
 import { IconMessageCircle, IconX } from "@tabler/icons-react";
-import { Sidebar } from "./sidebar";
 import { Link } from "react-router-dom";
 import { ChatAside } from "./aside";
-import { useAppShell, useNav, useSide } from "@/store/app-shell-store";
+import { Sidebar } from "./sidebar";
 
 interface DiagramLayoutProps {
     title?: string;

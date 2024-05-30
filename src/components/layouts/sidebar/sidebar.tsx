@@ -1,3 +1,4 @@
+import { useAppShell, useNav } from "@/store/app-shell-store"
 import {
     ActionIcon,
     AppShell,
@@ -5,12 +6,11 @@ import {
     Group,
     Stack,
     Title,
-    Tooltip,
+    Tooltip
 } from "@mantine/core"
-import { IconEdit, IconCode, IconDoor } from "@tabler/icons-react"
-import { useMemo, useState } from "react"
-import { ManualEdit, GenerateTools, Room } from "./sidebar-items"
-import { useAppShell, useNav } from "@/store/app-shell-store"
+import { IconCode, IconDoor, IconEdit } from "@tabler/icons-react"
+import React, { useMemo, useState } from "react"
+import { GenerateTools, ManualEdit, Room } from "./sidebar-items"
 
 interface SidebarItem {
     icon: React.ReactNode
@@ -61,8 +61,8 @@ const Sidebar = () => {
 
     return (
         <>
-            {appShellShowed && (
-                <div className="fixed top-[60px] left-0 bottom-0 bg-white w-[60px] z-20 p-4 border-r border-[#dee2e6]">
+            {
+                <div className={` ${appShellShowed ? '' : 'hidden'} fixed top-[60px] left-0 bottom-0 bg-white w-[60px] z-20 p-4 border-r border-[#dee2e6]`}>
                     <Stack gap={16}>
                         {sidebarItems.map((item, index) => (
                             <Tooltip
@@ -87,7 +87,7 @@ const Sidebar = () => {
                         ))}
                     </Stack>
                 </div>
-            )}
+            }
 
             <AppShell.Navbar
                 p="md"
@@ -109,4 +109,4 @@ const Sidebar = () => {
     )
 }
 
-export default Sidebar
+export default React.memo(Sidebar)

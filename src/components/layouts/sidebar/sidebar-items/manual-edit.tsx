@@ -1,7 +1,7 @@
-import { useMemo } from "react";
-import { useReactFlow } from "reactflow";
 import { Button, Group } from "@mantine/core";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
+import React, { useMemo } from "react";
+import { useReactFlow } from "reactflow";
 
 let id = 0;
 
@@ -57,4 +57,4 @@ const ManualEdit = () => {
     );
 };
 
-export default ManualEdit;
+export default React.memo(ManualEdit);

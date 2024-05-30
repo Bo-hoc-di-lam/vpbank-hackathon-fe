@@ -313,7 +313,7 @@ const DiagramPage = () => {
                 clearInterval(diagramManager.interval)
             }
         }
-    }, [diagramManager, graphType])
+    }, [])
 
     const clipboard = useClipboard({ timeout: 500 })
 
