@@ -2,10 +2,11 @@ import { initialEdges } from "@/edges"
 import { initialNodes, nodeTypes } from "@/nodes"
 import { Vertex } from "@/type/diagram"
 import { SystemType, WSEvent } from "@/type/ws_data"
-import { WSClient } from "@/ws/client"
+import { WSClient, WSEventMap } from "@/ws/client"
 import { title } from "process"
 import { Node, Edge, MarkerType } from "reactflow"
 import { convertIconName } from "@/utils/aws-icon"
+import { } from '@/ws/client'
 export class DiagramManager {
     public nodes: Node<any>[] = []
     public edges: Edge<any>[] = []
@@ -23,14 +24,12 @@ export class DiagramManager {
     public terraform: string = ""
     public drawIO: string = ""
 
+    private handler: { [key in WSEvent]: WSEventMap[key][] } = Object.values(WSEvent).reduce(
+        (acc, key) => { acc[key] = []; return acc },
+        {} as { [key in WSEvent]: WSEventMap[key][] }
+    )
+
     private onUserCounterChangeHandlers: ((count: number) => void)[] = []
-    private onRoomInfoHandlers: ((nameplate: string) => void)[] = []
-    private onCommentChangeHandlers: ((comment: string) => void)[] = []
-    private onDoneHandlers: ((data: any) => void)[] = []
-    private onMermaidHandlers: ((mermaid: string) => void)[] = []
-    private onTerraformHandlers: ((terraform: string) => void)[] = []
-    private onDrawIOHandlers: ((drawIO: string) => void)[] = []
-    private onErrorHandler: ((error: string) => void)[] = []
     private renderFunc: () => void
     private intervalTime: number = 0.5 * 1000
     public interval: NodeJS.Timeout | null = null
@@ -48,29 +47,17 @@ export class DiagramManager {
         this.ws = new WSClient()
 
         this.ws.on(WSEvent.Error, (error: string) => {
-            if (this.onErrorHandler) {
-                this.onErrorHandler.forEach((handler) => {
-                    handler(error)
-                })
-            }
+            this.handler[WSEvent.Error].forEach((handler) => handler(error))
         })
 
         this.ws.on(WSEvent.SetDrawIO, (data: string) => {
             this.drawIO += data
-            if (this.onDrawIOHandlers) {
-                this.onDrawIOHandlers.forEach((handler) => {
-                    handler(this.drawIO)
-                })
-            }
+            this.handler[WSEvent.SetDrawIO].forEach((handler) => handler(this.drawIO))
         })
 
         this.ws.on(WSEvent.SetTerraformAWS, (data: string) => {
             this.terraform += data
-            if (this.onTerraformHandlers) {
-                this.onTerraformHandlers.forEach((handler) => {
-                    handler(this.terraform)
-                })
-            }
+            this.handler[WSEvent.SetTerraformAWS].forEach((handler) => handler(this.terraform))
         })
 
         this.ws.on(WSEvent.UserJoined, (uid: string) => {
@@ -94,11 +81,7 @@ export class DiagramManager {
         this.ws.on(WSEvent.RoomInfo, (data: string) => {
             this.userCounter = 0
             this.nameplate = data
-            if (this.onRoomInfoHandlers) {
-                this.onRoomInfoHandlers.forEach((handler) => {
-                    handler(data)
-                })
-            }
+            this.handler[WSEvent.RoomInfo].forEach((handler) => handler(data))
             if (this.onUserCounterChangeHandlers) {
                 this.onUserCounterChangeHandlers.forEach((handler) => {
                     handler(this.userCounter)
@@ -179,12 +162,7 @@ export class DiagramManager {
 
         this.ws.on(WSEvent.SetComment, (data: any) => {
             this.comment += data
-
-            if (this.onCommentChangeHandlers) {
-                this.onCommentChangeHandlers.forEach((handler) => {
-                    handler(this.comment)
-                })
-            }
+            this.handler[WSEvent.SetComment].forEach((handler) => handler(this.comment))
         })
 
         this.ws.on(WSEvent.SetCommentAWS, (data: any) => {
@@ -193,12 +171,7 @@ export class DiagramManager {
             if (this.handleAWSChatCallback) {
                 this.handleAWSChatCallback()
             }
-
-            if (this.onCommentChangeHandlers) {
-                this.onCommentChangeHandlers.forEach((handler) => {
-                    handler(this.comment)
-                })
-            }
+            this.handler[WSEvent.SetComment].forEach((handler) => handler(this.comment))
         })
 
         // this.ws.on(WSEvent.AddSubGraph, (data: any) => {
@@ -226,21 +199,13 @@ export class DiagramManager {
                 this.renderFunc()
             }
 
-            if (this.onDoneHandlers) {
-                this.onDoneHandlers.forEach((handler) => {
-                    handler(data)
-                })
-            }
+            this.handler[WSEvent.Done].forEach((handler) => handler(data))
+
         })
 
         this.ws.on(WSEvent.Mermaid, (data: any) => {
             this.mermaid = data
-
-            if (this.onMermaidHandlers) {
-                this.onMermaidHandlers.forEach((handler) => {
-                    handler(data)
-                })
-            }
+            this.handler[WSEvent.Mermaid].forEach((handler) => handler(data))
         })
 
         this.ws.on(WSEvent.ResetAWS, () => {
@@ -300,32 +265,8 @@ export class DiagramManager {
         this.ws.sendEditPrompt(query, vertex)
     }
 
-    public onError(handler: (error: string) => void) {
-        this.onErrorHandler.push(handler)
-    }
-
-    public onDrawIO(handler: (drawIO: string) => void) {
-        this.onDrawIOHandlers.push(handler)
-    }
-
-    public onTerraform(handler: (terraform: string) => void) {
-        this.onTerraformHandlers.push(handler)
-    }
-
-    public onRoomInfo(handler: (nameplate: string) => void) {
-        this.onRoomInfoHandlers.push(handler)
-    }
-
-    public onCommentChange(handler: (comment: string) => void) {
-        this.onCommentChangeHandlers.push(handler)
-    }
-
-    public onDone(handler: (data: any) => void) {
-        this.onDoneHandlers.push(handler)
-    }
-
-    public onMermaid(handler: (mermaid: string) => void) {
-        this.onMermaidHandlers.push(handler)
+    public on(event: WSEvent, handler: WSEventMap[WSEvent]) {
+        this.handler[event].push(handler)
     }
 
     public onUserCounterChange(handler: (count: number) => void) {

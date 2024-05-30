@@ -35,6 +35,7 @@ import {
 } from "@tabler/icons-react"
 import { useClipboard, useForceUpdate, useFullscreen } from "@mantine/hooks"
 import { useAppShell } from "@/store/app-shell-store"
+import { WSEvent } from "@/type/ws_data"
 
 const elk = new ELK()
 
@@ -265,7 +266,7 @@ const DiagramPage = () => {
             setUserCount(count)
         })
 
-        diagramManager.onRoomInfo((nameplate) => {
+        diagramManager.on(WSEvent.RoomInfo, (nameplate: string) => {
             toast.success(`Room name: ${nameplate}`)
             setNameplate(nameplate)
         })
@@ -298,7 +299,7 @@ const DiagramPage = () => {
             diagramManager.needRerender = false
         }, 500)
 
-        diagramManager.onDone(() => {
+        diagramManager.on(WSEvent.Done, () => {
             setIsGenerating(false)
         })
 
