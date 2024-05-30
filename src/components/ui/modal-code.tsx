@@ -1,5 +1,5 @@
-import { Button, CopyButton, MantineSize, Modal } from "@mantine/core"
-import { ReactNode, useEffect } from "react"
+import { Button, CopyButton, Modal } from "@mantine/core"
+import { ReactNode } from "react"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 
 interface ModalCodeProps extends React.HTMLProps<HTMLDivElement> {
@@ -9,6 +9,7 @@ interface ModalCodeProps extends React.HTMLProps<HTMLDivElement> {
     data?: string,
     opened: boolean,
     fileName: string,
+    language?: string,
     handler: { open: () => void, close: () => void }
 }
 
@@ -20,6 +21,7 @@ export const ModalCode = ({
     title,
     modalSize = "100%",
     data,
+    language,
     fileName,
     ...props
 }: ModalCodeProps) => {
@@ -61,7 +63,7 @@ export const ModalCode = ({
                         Export to file
                     </Button>
                 </div>
-                <SyntaxHighlighter language="auto" wrapLines lineProps={{
+                <SyntaxHighlighter language={language} wrapLines lineProps={{
                     style: {
                         wordBreak: "break-all",
                         whiteSpace: "pre-wrap",
@@ -69,7 +71,6 @@ export const ModalCode = ({
                 }}>
                     {data}
                 </SyntaxHighlighter>
-                {children}
             </Modal>
 
         </>

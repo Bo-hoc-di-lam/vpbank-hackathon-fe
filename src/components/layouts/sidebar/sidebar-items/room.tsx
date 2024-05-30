@@ -3,7 +3,6 @@ import { WSEvent } from "@/type/ws_data";
 import { ActionIcon, Button, CopyButton, Input, TextInput, Tooltip } from "@mantine/core";
 import { IconCheck, IconCopy, IconDoor } from "@tabler/icons-react";
 import { useState } from "react";
-import toast from "react-hot-toast";
 
 
 

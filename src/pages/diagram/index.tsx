@@ -1,22 +1,19 @@
+import ELK from "elkjs/lib/elk.bundled.js"
 import { useCallback, useEffect, useState } from "react"
 import ReactFlow, {
-    addEdge,
     Background,
     Controls,
     OnConnect,
+    Panel,
+    addEdge,
     useEdgesState,
     useNodesState,
     useReactFlow,
-    Panel,
 } from "reactflow"
-import ELK from "elkjs/lib/elk.bundled.js"
 
-import { nodeTypes } from "../../nodes"
-import { edgeTypes } from "../../edges"
-import { useRemoveLogo } from "../../hooks"
-import { useWtf } from "@/hooks/use-wtf"
+import { useAppShell } from "@/store/app-shell-store"
 import { useDiagramManager } from "@/store/digaram-mananger-store"
-import toast from "react-hot-toast"
+import { WSEvent } from "@/type/ws_data"
 import {
     ActionIcon,
     Button,
@@ -25,6 +22,7 @@ import {
     SegmentedControl,
     Tooltip,
 } from "@mantine/core"
+import { useClipboard, useFullscreen } from "@mantine/hooks"
 import {
     IconBrandAws,
     IconGraph,
@@ -33,9 +31,10 @@ import {
     IconUser,
     IconUsers,
 } from "@tabler/icons-react"
-import { useClipboard, useForceUpdate, useFullscreen } from "@mantine/hooks"
-import { useAppShell } from "@/store/app-shell-store"
-import { WSEvent } from "@/type/ws_data"
+import toast from "react-hot-toast"
+import { edgeTypes } from "../../edges"
+import { useRemoveLogo } from "../../hooks"
+import { nodeTypes } from "../../nodes"
 
 const elk = new ELK()
 

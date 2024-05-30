@@ -37,6 +37,7 @@ const MermaidCode = () => {
                 handler={handler}
                 opened={opened}
                 disabled={codeString === ""}
+                language="mermaid"
             />
             <Button
                 fullWidth
@@ -99,6 +100,7 @@ const TerraformAction = () => {
                 fileName="terraform.tf"
                 handler={handler}
                 opened={opened}
+                language="hcl"
             />
             <Button.Group>
                 <Button
