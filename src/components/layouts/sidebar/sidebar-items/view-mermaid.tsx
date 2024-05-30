@@ -23,7 +23,6 @@ const ViewMermaid = () => {
         diagramManager.onDone((data) => {
             console.log("mermaid", data)
             if (data.event !== WSEvent.GenerateDrawIO) {
-                console.log("not gen")
                 return
             }
             exportToDrawIO(diagramManager.drawIO)

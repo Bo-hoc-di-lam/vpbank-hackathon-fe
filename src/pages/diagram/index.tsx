@@ -190,11 +190,11 @@ const DiagramPage = () => {
 
     const [nameplate, setNameplate] = useState<string>("");
     const [userCount, setUserCount] = useState<number>(0);
-
     useEffect(() => {
         diagramManager.onUserCounterChange((count) => {
             setUserCount(count);
         });
+
 
         diagramManager.onRoomInfo((nameplate) => {
             toast.success(`Room name: ${nameplate}`);
