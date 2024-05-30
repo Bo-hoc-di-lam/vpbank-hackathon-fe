@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from "react"
 import ReactMarkdown from "react-markdown"
 import toast from "react-hot-toast"
 import { useReactFlow } from "reactflow"
+import { WSEvent } from "@/type/ws_data"
 
 interface Message {
     role: string
@@ -81,7 +82,7 @@ const ChatAside = () => {
 
     useEffect(() => {
         diagramManager.setHandleAWSChatCallback(handleAWSChat)
-        diagramManager.onCommentChange((comment) => {
+        diagramManager.on(WSEvent.SetComment, (comment: string) => {
             if (comment !== "") {
                 setConversation((prevConversation) => {
                     const newConversation = [...prevConversation]
@@ -95,7 +96,7 @@ const ChatAside = () => {
             }
         })
 
-        diagramManager.onDone(() => {
+        diagramManager.on(WSEvent.Done, () => {
             // hide toast loading
             toast.dismiss(loadingId)
             setMessaging(false)
@@ -108,7 +109,7 @@ const ChatAside = () => {
             toast.success("Done!")
         })
 
-        diagramManager.onError((error) => {
+        diagramManager.on(WSEvent.Error, (error: string) => {
             toast.dismiss()
             setLoadingId(null)
             toast.error(error)

@@ -26,6 +26,7 @@ import {
 } from "@tabler/icons-react";
 import { useClipboard, useFullscreen } from "@mantine/hooks";
 import { useAppShell } from "@/store/app-shell-store";
+import { WSEvent } from "@/type/ws_data";
 
 const elk = new ELK();
 
@@ -196,7 +197,7 @@ const DiagramPage = () => {
         });
 
 
-        diagramManager.onRoomInfo((nameplate) => {
+        diagramManager.on(WSEvent.RoomInfo, (nameplate) => {
             toast.success(`Room name: ${nameplate}`);
             setNameplate(nameplate);
         });

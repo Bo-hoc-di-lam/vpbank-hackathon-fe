@@ -4,7 +4,7 @@ import { Message, WSEvent, Prompt, MessageData, EditNode, SystemTypeDTO, SystemT
 
 type MessageCallback<T extends MessageData> = (msg: T) => void
 
-interface WSEventMap {
+export interface WSEventMap {
     // info
     [WSEvent.Error]: MessageCallback<string>
     [WSEvent.UserJoined]: MessageCallback<string>
@@ -37,6 +37,7 @@ interface WSEventMap {
     [WSEvent.SetComment]: MessageCallback<string>
     [WSEvent.SetTerraform]: MessageCallback<string>
     [WSEvent.SetDrawIO]: MessageCallback<string>
+    [WSEvent.SetAnsible]: MessageCallback<string>
 
     // server diagram with custom icon response
     [WSEvent.AddNodeAWS]: MessageCallback<Vertex>
@@ -51,6 +52,7 @@ interface WSEventMap {
     [WSEvent.SetNodePositionAWS]: MessageCallback<Vertex>
     [WSEvent.SetCommentAWS]: MessageCallback<string>
     [WSEvent.SetTerraformAWS]: MessageCallback<string>
+    [WSEvent.SetAnsibleAWS]: MessageCallback<string>
 
     [key: string]: MessageCallback<any>
 }
@@ -101,6 +103,14 @@ export class WSClient {
         const data: Message<string> = {
             event: WSEvent.JoinRoom,
             data: nameplate
+        }
+        this.sendMessage(data)
+    }
+
+    public generateAnsible() {
+        const data: Message<any> = {
+            event: WSEvent.GenerateAnsible,
+            data: null,
         }
         this.sendMessage(data)
     }

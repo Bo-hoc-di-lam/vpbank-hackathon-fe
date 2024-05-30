@@ -9,6 +9,7 @@ import { Button, Divider, Modal } from "@mantine/core"
 import { exportToDrawIO, exportToMermaidFile } from "@/utils/file"
 import { IconCopy, IconFileExport } from "@tabler/icons-react"
 import { WSEvent } from "@/type/ws_data"
+import { ModalCode } from "@/components/ui/modal_code"
 
 const ViewMermaid = () => {
     const diagramManager = useDiagramManager()
@@ -20,7 +21,7 @@ const ViewMermaid = () => {
         diagramManager.genDrawIO()
     }
     useEffect(() => {
-        diagramManager.onDone((data) => {
+        diagramManager.on(WSEvent.Done, (data: any) => {
             console.log("mermaid", data)
             if (data.event !== WSEvent.GenerateDrawIO) {
                 return
@@ -29,10 +30,9 @@ const ViewMermaid = () => {
             toast.success("DrawIO exported successfully")
         })
 
-        diagramManager.onMermaid((mermaid) => {
+        diagramManager.on(WSEvent.Mermaid, (mermaid: string) => {
             setCodeString(mermaid)
         })
-
     }, [])
 
 
@@ -65,44 +65,13 @@ const ViewMermaid = () => {
 
     return (
         <div className="flex flex-col gap-4">
-            <Modal
+            <ModalCode
                 opened={mermaidModalOpened}
-                onClose={mermaidModal.close}
+                handler={mermaidModal}
                 title="Mermaid"
-                size="100%"
-            >
-                <div className="flex gap-4">
-                    <Button
-                        variant="light"
-                        onClick={copyToClipboard}
-                        disabled={codeString === ""}
-                    >
-                        Copy to Clipboard
-                        <IconCopy size={16} />
-                    </Button>
-                    <Button
-                        variant="light"
-                        onClick={exportToFile}
-                        disabled={codeString === ""}
-                    >
-                        Export to File
-                        <IconFileExport size={16} />
-                    </Button>
-                </div>
-                <SyntaxHighlighter
-                    language="plaintext"
-                    style={dracula}
-                    wrapLines={true}
-                    lineProps={{
-                        style: {
-                            wordBreak: "break-all",
-                            whiteSpace: "pre-wrap",
-                        },
-                    }}
-                >
-                    {codeString}
-                </SyntaxHighlighter>
-            </Modal>
+                data={codeString}
+                fileName="mermaid.mmd"
+            />
             <Button
                 fullWidth
                 variant="light"

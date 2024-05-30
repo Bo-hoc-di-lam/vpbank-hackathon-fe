@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { Button, Card, Divider, Modal } from "@mantine/core"
 import {
+    IconBrandAnsible,
     IconBrandAws,
     IconBrandTerraform,
     IconCopy,
@@ -12,6 +13,8 @@ import { useClipboard, useDisclosure } from "@mantine/hooks"
 import { dracula } from "react-syntax-highlighter/dist/esm/styles/prism"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { exportToTerraform } from "@/utils/file"
+import { WSEvent } from "@/type/ws_data"
+import { ModalCode } from "@/components/ui/modal_code"
 
 const AWSAction = () => {
     const diagramManager = useDiagramManager()
@@ -20,11 +23,11 @@ const AWSAction = () => {
     const [generating, setGenerating] = useState<boolean>(false)
 
     useEffect(() => {
-        diagramManager.onTerraform((terraform) => {
+        diagramManager.on(WSEvent.SetTerraformAWS, (terraform) => {
             setTerraform(terraform)
         })
 
-        diagramManager.onDone(() => {
+        diagramManager.on(WSEvent.Done, () => {
             setGenerating(false)
         })
 
@@ -40,6 +43,16 @@ const AWSAction = () => {
 
         toast.loading("Generating Terraform Code")
         diagramManager.genTerraform()
+    }
+
+    const generateAnsible = () => {
+        setGenerating(true)
+        if (!diagramManager.terraform) {
+            toast.error("No diagram found")
+            return
+        }
+        toast.loading("Generating Ansible Code")
+        diagramManager.genAnsible()
     }
 
     const generateAWS = () => {
@@ -117,6 +130,17 @@ const AWSAction = () => {
                 {/* {terraform === "" ? "Please generate first to view" : "View Terraform Code"} */}
                 Generate Terraform Code
             </Button>
+            <Button
+                fullWidth
+                variant="light"
+                rightSection={<IconBrandAnsible size={20} />}
+                onClick={() => {
+                    generateAnsible()
+                }}
+            >
+                Generate Ansible code
+            </Button>
+
             <Modal
                 opened={opened}
                 onClose={close}

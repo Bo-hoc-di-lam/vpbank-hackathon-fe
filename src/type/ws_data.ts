@@ -23,6 +23,7 @@ export enum WSEvent {
     GenerateCode = 'GENERATE_CODE',
     Ping = 'PING',
     GenerateDrawIO = 'GENERATE_DRAWIO',
+    GenerateAnsible = 'GENERATE_ANSIBLE',
 
 
     // server diagram response
@@ -39,6 +40,7 @@ export enum WSEvent {
     SetComment = 'SET_COMMENT',
     SetTerraform = 'SET_TERRAFORM',
     SetDrawIO = "SET_DRAWIO",
+    SetAnsible = "SET_ANSIBLE",
 
     // server diagram with icon response
     AddNodeAWS = 'ADD_NODE_AWS',
@@ -54,6 +56,8 @@ export enum WSEvent {
     SetCommentAWS = 'SET_COMMENT_AWS',
     ResetAWS = 'RESET_AWS',
     SetTerraformAWS = 'SET_TERRAFORM_AWS',
+    SetAnsibleAWS = 'SET_ANSIBLE_AWS',
+
 }
 
 export type MessageData = string | Prompt | Vertex | Link | SubGraph | SystemTypeDTO
