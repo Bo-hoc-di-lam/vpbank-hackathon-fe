@@ -11,7 +11,6 @@ export enum WSEvent {
     UserLeave = "LEAVE",
     Lock = "LOCK",
     Done = "DONE",
-    Mermaid = "MERMAID",
     RoomInfo = 'ROOM_INFO',
     Reset = "RESET",
 
@@ -23,9 +22,11 @@ export enum WSEvent {
     GenerateCode = 'GENERATE_CODE',
     Ping = 'PING',
     GenerateDrawIO = 'GENERATE_DRAWIO',
+    GenerateAnsible = 'GENERATE_ANSIBLE',
 
 
     // server diagram response
+    Mermaid = "MERMAID",
     AddNode = 'ADD_NODE',
     AddLink = 'ADD_LINK',
     AddSubGraph = 'ADD_SUB_GRAPH',
@@ -39,8 +40,10 @@ export enum WSEvent {
     SetComment = 'SET_COMMENT',
     SetTerraform = 'SET_TERRAFORM',
     SetDrawIO = "SET_DRAWIO",
+    SetAnsible = "SET_ANSIBLE",
 
     // server diagram with icon response
+    MermaidAWS = "MERMAID_AWS",
     AddNodeAWS = 'ADD_NODE_AWS',
     AddLinkAWS = 'ADD_LINK_AWS',
     AddSubGraphAWS = 'ADD_SUB_GRAPH_AWS',
@@ -54,6 +57,7 @@ export enum WSEvent {
     SetCommentAWS = 'SET_COMMENT_AWS',
     ResetAWS = 'RESET_AWS',
     SetTerraformAWS = 'SET_TERRAFORM_AWS',
+    SetAnsibleAWS = 'SET_ANSIBLE_AWS',
 }
 
 export type MessageData = string | Prompt | Vertex | Link | SubGraph | SystemTypeDTO

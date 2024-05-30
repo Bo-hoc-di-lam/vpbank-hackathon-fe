@@ -1,6 +1,6 @@
 
 import { Link, SubGraph, Vertex } from '@/type/diagram'
-import { Message, WSEvent, Prompt, MessageData, EditNode, SystemTypeDTO, SystemType } from '@/type/ws_data'
+import { EditNode, Message, MessageData, Prompt, SystemType, SystemTypeDTO, WSEvent } from '@/type/ws_data'
 
 type MessageCallback<T extends MessageData> = (msg: T) => void
 
@@ -11,7 +11,6 @@ export interface WSEventMap {
     [WSEvent.UserLeave]: MessageCallback<string>
     [WSEvent.Lock]: MessageCallback<any>
     [WSEvent.Done]: MessageCallback<any>
-    [WSEvent.Mermaid]: MessageCallback<string>
     [WSEvent.RoomInfo]: MessageCallback<string>
     [WSEvent.Reset]: MessageCallback<any>
 
@@ -22,8 +21,10 @@ export interface WSEventMap {
     [WSEvent.JoinRoom]: MessageCallback<string>
     [WSEvent.GenerateCode]: MessageCallback<SystemTypeDTO>
     [WSEvent.GenerateDrawIO]: MessageCallback<any>
+    [WSEvent.GenerateAnsible]: MessageCallback<any>
 
     // server diagram response
+    [WSEvent.Mermaid]: MessageCallback<string>
     [WSEvent.AddNode]: MessageCallback<Vertex>
     [WSEvent.AddLink]: MessageCallback<Link>
     [WSEvent.AddSubGraph]: MessageCallback<SubGraph>
@@ -37,8 +38,10 @@ export interface WSEventMap {
     [WSEvent.SetComment]: MessageCallback<string>
     [WSEvent.SetTerraform]: MessageCallback<string>
     [WSEvent.SetDrawIO]: MessageCallback<string>
+    [WSEvent.SetAnsible]: MessageCallback<string>
 
     // server diagram with custom icon response
+    [WSEvent.MermaidAWS]: MessageCallback<string>
     [WSEvent.AddNodeAWS]: MessageCallback<Vertex>
     [WSEvent.AddLinkAWS]: MessageCallback<Link>
     [WSEvent.AddSubGraphAWS]: MessageCallback<SubGraph>
@@ -51,6 +54,7 @@ export interface WSEventMap {
     [WSEvent.SetNodePositionAWS]: MessageCallback<Vertex>
     [WSEvent.SetCommentAWS]: MessageCallback<string>
     [WSEvent.SetTerraformAWS]: MessageCallback<string>
+    [WSEvent.SetAnsibleAWS]: MessageCallback<string>
 
     [key: string]: MessageCallback<any>
 }
@@ -101,6 +105,14 @@ export class WSClient {
         const data: Message<string> = {
             event: WSEvent.JoinRoom,
             data: nameplate
+        }
+        this.sendMessage(data)
+    }
+
+    public generateAnsible() {
+        const data: Message<any> = {
+            event: WSEvent.GenerateAnsible,
+            data: null,
         }
         this.sendMessage(data)
     }

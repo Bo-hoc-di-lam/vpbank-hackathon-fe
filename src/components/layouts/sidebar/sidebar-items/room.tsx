@@ -2,7 +2,7 @@ import { useDiagramManager } from "@/store/digaram-mananger-store";
 import { WSEvent } from "@/type/ws_data";
 import { ActionIcon, Button, CopyButton, Input, TextInput, Tooltip } from "@mantine/core";
 import { IconCheck, IconCopy, IconDoor } from "@tabler/icons-react";
-import { useState } from "react";
+import React, { useState } from "react";
 
 
 
@@ -66,4 +66,4 @@ const Room = () => {
     )
 }
 
-export default Room
+export default React.memo(Room)

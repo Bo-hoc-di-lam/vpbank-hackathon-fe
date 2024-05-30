@@ -1,12 +1,8 @@
-import { initialEdges } from "@/edges"
-import { initialNodes, nodeTypes } from "@/nodes"
-import { Vertex } from "@/type/diagram"
-import { SystemType, WSEvent } from "@/type/ws_data"
-import { WSClient, WSEventMap } from "@/ws/client"
-import { title } from "process"
-import { Node, Edge, MarkerType } from "reactflow"
-import { convertIconName } from "@/utils/aws-icon"
-import { } from '@/ws/client'
+import { Vertex } from "@/type/diagram";
+import { SystemType, WSEvent } from "@/type/ws_data";
+import { convertIconName } from "@/utils/aws-icon";
+import { WSClient, WSEventMap } from "@/ws/client";
+import { Edge, MarkerType, Node } from "reactflow";
 export class DiagramManager {
     public nodes: Node<any>[] = []
     public edges: Edge<any>[] = []
@@ -23,17 +19,19 @@ export class DiagramManager {
     public userCounter: number = 0
     public terraform: string = ""
     public drawIO: string = ""
+    public ansible: string = ""
+    public interval: NodeJS.Timeout | null = null
 
+
+
+    private onUserCounterChangeHandlers: ((count: number) => void)[] = []
+    private renderFunc: () => void
+    private intervalTime: number = 0.2 * 1000
+    private started: boolean = false
     private handler: { [key in WSEvent]: WSEventMap[key][] } = Object.values(WSEvent).reduce(
         (acc, key) => { acc[key] = []; return acc },
         {} as { [key in WSEvent]: WSEventMap[key][] }
     )
-
-    private onUserCounterChangeHandlers: ((count: number) => void)[] = []
-    private renderFunc: () => void
-    private intervalTime: number = 0.5 * 1000
-    public interval: NodeJS.Timeout | null = null
-    private started: boolean = false
 
     private handleAWSChatCallback: () => void
 
@@ -48,6 +46,11 @@ export class DiagramManager {
 
         this.ws.on(WSEvent.Error, (error: string) => {
             this.handler[WSEvent.Error].forEach((handler) => handler(error))
+        })
+
+        this.ws.on(WSEvent.SetAnsibleAWS, (data: string) => {
+            this.ansible += data
+            this.handler[WSEvent.SetAnsibleAWS].forEach((handler) => handler(this.ansible))
         })
 
         this.ws.on(WSEvent.SetDrawIO, (data: string) => {
@@ -204,8 +207,13 @@ export class DiagramManager {
         })
 
         this.ws.on(WSEvent.Mermaid, (data: any) => {
-            this.mermaid = data
-            this.handler[WSEvent.Mermaid].forEach((handler) => handler(data))
+            this.mermaid += data
+            this.handler[WSEvent.Mermaid].forEach((handler) => handler(this.mermaid))
+        })
+
+        this.ws.on(WSEvent.MermaidAWS, (data: string) => {
+            this.mermaidAWS += data
+            this.handler[WSEvent.MermaidAWS].forEach((handler) => handler(this.mermaidAWS))
         })
 
         this.ws.on(WSEvent.ResetAWS, () => {
@@ -237,8 +245,13 @@ export class DiagramManager {
 
     public genAWS() {
         this.isGenerating = true
+        this.mermaidAWS = ""
         this.resetInterval()
         this.ws.generateIcon(SystemType.AWS)
+    }
+
+    public genAnsible() {
+        this.ws.generateAnsible()
     }
 
     public genDrawIO() {
@@ -255,6 +268,7 @@ export class DiagramManager {
     }
 
     public edit(query: string) {
+        this.mermaid = ""
         this.isGenerating = true
         this.resetInterval()
         const vertex: Vertex[] = this.selectedVertex().map((node) => ({
