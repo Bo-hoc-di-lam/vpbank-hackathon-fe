@@ -7,9 +7,9 @@ import {
     Title,
     Tooltip,
 } from "@mantine/core"
-import { IconEdit, IconChartBar, IconCode, IconDoor } from "@tabler/icons-react"
+import { IconEdit, IconCode, IconDoor } from "@tabler/icons-react"
 import { useMemo, useState } from "react"
-import { ManualEdit, ViewMermaid, AWSAction, Room } from "./sidebar-items"
+import { ManualEdit, GenerateTools, Room } from "./sidebar-items"
 import { useAppShell, useNav } from "@/store/app-shell-store"
 
 interface SidebarItem {
@@ -32,14 +32,9 @@ const Sidebar = () => {
                 chilren: <ManualEdit />,
             },
             {
-                icon: <IconChartBar size={24} />,
-                label: "View Mermaid Code",
-                chilren: <ViewMermaid />,
-            },
-            {
                 icon: <IconCode size={24} />,
                 label: "Generate Tools",
-                chilren: <AWSAction />,
+                chilren: <GenerateTools />,
             },
         ]
     }, [])

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react"
 import ReactFlow, {
     addEdge,
     Background,
@@ -8,37 +8,46 @@ import ReactFlow, {
     useNodesState,
     useReactFlow,
     Panel,
-} from "reactflow";
-import ELK from "elkjs/lib/elk.bundled.js";
+} from "reactflow"
+import ELK from "elkjs/lib/elk.bundled.js"
 
-import { nodeTypes } from "../../nodes";
-import { edgeTypes } from "../../edges";
-import { useRemoveLogo } from "../../hooks";
-import { useWtf } from "@/hooks/use-wtf";
-import { useDiagramManager } from "@/store/digaram-mananger-store";
-import toast from "react-hot-toast";
-import { ActionIcon, Button, Indicator } from "@mantine/core";
+import { nodeTypes } from "../../nodes"
+import { edgeTypes } from "../../edges"
+import { useRemoveLogo } from "../../hooks"
+import { useWtf } from "@/hooks/use-wtf"
+import { useDiagramManager } from "@/store/digaram-mananger-store"
+import toast from "react-hot-toast"
 import {
+    ActionIcon,
+    Button,
+    Center,
+    Indicator,
+    SegmentedControl,
+    Tooltip,
+} from "@mantine/core"
+import {
+    IconBrandAws,
+    IconGraph,
     IconMaximize,
     IconMinimize,
     IconUser,
     IconUsers,
-} from "@tabler/icons-react";
-import { useClipboard, useFullscreen } from "@mantine/hooks";
-import { useAppShell } from "@/store/app-shell-store";
+} from "@tabler/icons-react"
+import { useClipboard, useForceUpdate, useFullscreen } from "@mantine/hooks"
+import { useAppShell } from "@/store/app-shell-store"
 
-const elk = new ELK();
+const elk = new ELK()
 
 const createGraph = (nodes, edges, subGraphs, options) => {
-    const isHorizontal = options?.["elk.direction"] === "RIGHT";
+    const isHorizontal = options?.["elk.direction"] === "RIGHT"
 
     const createSubGraph = (parentNode, allNodes, allEdges) => {
         const children = allNodes.filter(
             (node) => node.parentNode === parentNode.id
-        );
+        )
         const nestedSubGraphs = subGraphs.filter(
             (subGraph) => subGraph.parentNode === parentNode.id
-        );
+        )
 
         return {
             id: parentNode.id,
@@ -62,11 +71,11 @@ const createGraph = (nodes, edges, subGraphs, options) => {
                     edge.source === parentNode.id ||
                     edge.target === parentNode.id
             ),
-        };
-    };
+        }
+    }
 
-    const rootNodes = nodes.filter((node) => !node.parentNode);
-    const rootSubGraphs = subGraphs.filter((subGraph) => !subGraph.parentNode);
+    const rootNodes = nodes.filter((node) => !node.parentNode)
+    const rootSubGraphs = subGraphs.filter((subGraph) => !subGraph.parentNode)
 
     return {
         id: "root",
@@ -86,8 +95,8 @@ const createGraph = (nodes, edges, subGraphs, options) => {
                 )
             ),
         edges: edges,
-    };
-};
+    }
+}
 
 const basicNodeInfo = (info: any): any => {
     const node = {
@@ -102,156 +111,233 @@ const basicNodeInfo = (info: any): any => {
             y: info.y,
         },
         type: info.type || "common",
-    };
+    }
 
-    return node;
-};
+    return node
+}
 
 const processsubGraph = (subGraph: any): any => {
-    let output = [];
+    let output = []
 
-    const node = basicNodeInfo(subGraph);
+    const node = basicNodeInfo(subGraph)
     if (subGraph.children.length > 0) {
         subGraph.children.forEach((child) => {
-            output = output.concat(processsubGraph(child));
-        });
+            output = output.concat(processsubGraph(child))
+        })
 
-        node.type = "custom-group";
+        node.type = "custom-group"
         node.style = {
             width: subGraph.width,
             height: subGraph.height,
-        };
+        }
     }
 
-    output.push(node);
-    return output;
-};
+    output.push(node)
+    return output
+}
 
 const getLayoutedElements = async (nodes, edges, subGraphs, options) => {
-    const graph = createGraph(nodes, edges, subGraphs, options);
+    const graph = createGraph(nodes, edges, subGraphs, options)
 
     try {
-        const layoutedGraph = await elk.layout(graph);
-        const nodes = layoutedGraph.children.map(processsubGraph).flat();
+        const layoutedGraph = await elk.layout(graph)
+        const nodes = layoutedGraph.children.map(processsubGraph).flat()
 
         // sort to bring subGraphs to top
         nodes.sort((a, b) => {
             if (a.type === "custom-group" && b.type !== "custom-group") {
-                return 1;
+                return 1
             }
             if (a.type !== "custom-group" && b.type === "custom-group") {
-                return -1;
+                return -1
             }
-            return 0;
-        });
+            return 0
+        })
 
         return {
             nodes,
             edges: layoutedGraph.edges,
             subGraphs, // handle subGraphs here if needed
-        };
+        }
     } catch (error) {
-        console.error(error);
-        return { nodes, edges, subGraphs };
+        console.error(error)
+        return { nodes, edges, subGraphs }
     }
-};
+}
+
+enum GraphType {
+    BASE = "base",
+    AWS = "aws",
+}
 
 const DiagramPage = () => {
-    useRemoveLogo();
-    // useWtf();
+    useRemoveLogo()
+    const diagramManager = useDiagramManager()
+    const [isGenerating, setIsGenerating] = useState(false)
 
-    const { fitView } = useReactFlow();
-    const [nodes, setNodes, onNodesChange] = useNodesState([]);
-    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+    const graphTypesData = [
+        {
+            label: (
+                <Center className="gap-2">
+                    <IconGraph size={14} />
+                    <span>Base</span>
+                </Center>
+            ),
+            value: GraphType.BASE,
+        },
+        {
+            label: (
+                <Tooltip
+                    label="Generate base diagram first"
+                    disabled={!!diagramManager.nodes.length}
+                    withArrow
+                    offset={10}
+                >
+                    <Center className="gap-2">
+                        <IconBrandAws size={14} />
+                        <span>AWS</span>
+                    </Center>
+                </Tooltip>
+            ),
+            value: GraphType.AWS,
+            disabled: !diagramManager.nodes.length,
+        },
+    ]
+
+    const { fitView } = useReactFlow()
+    const [nodes, setNodes, onNodesChange] = useNodesState([])
+    const [edges, setEdges, onEdgesChange] = useEdgesState([])
+    const [graphType, setGraphType] = useState<GraphType>(GraphType.BASE)
 
     const onConnect: OnConnect = useCallback(
         (connection) => setEdges((eds) => addEdge(connection, eds)),
         [setEdges]
-    );
+    )
 
     const setDiagram = async (nodes, edges, subGraphs) => {
         const layouted = await getLayoutedElements(nodes, edges, subGraphs, {
             "elk.direction": "DOWN",
-        });
+        })
 
-        setNodes([...layouted.nodes]);
-        setEdges([...layouted.edges]);
+        setNodes([...layouted.nodes])
+        setEdges([...layouted.edges])
 
         window.requestAnimationFrame(() => {
-            fitView();
-        });
-    };
-
-    const diagramManager = useDiagramManager();
+            fitView()
+        })
+    }
 
     const onSelectionChange = ({ nodes, edges }) => {
-        diagramManager.setSelectedNodes(nodes);
-    };
+        diagramManager.setSelectedNodes(nodes)
+    }
 
-    const [nameplate, setNameplate] = useState<string>("");
-    const [userCount, setUserCount] = useState<number>(0);
+    const [nameplate, setNameplate] = useState<string>("")
+    const [userCount, setUserCount] = useState<number>(0)
+
+    const handleChangeGraphType = async (type: GraphType) => {
+        setGraphType(type)
+        switch (type) {
+            case GraphType.BASE:
+                await setDiagram(
+                    diagramManager.nodes,
+                    diagramManager.edges,
+                    diagramManager.subGraphs
+                )
+                break
+            case GraphType.AWS:
+                if (!diagramManager.nodesAWS.length) {
+                    toast.loading("Generating AWS Service")
+                    diagramManager.genAWS()
+                    setIsGenerating(true)
+                }
+                await setDiagram(
+                    diagramManager.nodesAWS,
+                    diagramManager.edgesAWS,
+                    diagramManager.subGraphs
+                )
+                break
+        }
+        fitView()
+    }
+
     useEffect(() => {
         diagramManager.onUserCounterChange((count) => {
-            setUserCount(count);
-        });
-
+            setUserCount(count)
+        })
 
         diagramManager.onRoomInfo((nameplate) => {
-            toast.success(`Room name: ${nameplate}`);
-            setNameplate(nameplate);
-        });
+            toast.success(`Room name: ${nameplate}`)
+            setNameplate(nameplate)
+        })
 
         diagramManager.setInterval(async () => {
             if (!diagramManager.needRerender) {
-                return;
+                return
             }
 
-            console.log("rendering...");
-            await setDiagram(
-                diagramManager.nodes,
-                diagramManager.edges,
-                diagramManager.subGraphs
-            ); // Pass subGraphs
+            console.log("rendering...")
+            setIsGenerating(true)
 
-            diagramManager.needRerender = false;
-        }, 500);
+            switch (graphType) {
+                case GraphType.BASE:
+                    await setDiagram(
+                        diagramManager.nodes,
+                        diagramManager.edges,
+                        diagramManager.subGraphs
+                    )
+                    break
+                case GraphType.AWS:
+                    await setDiagram(
+                        diagramManager.nodesAWS,
+                        diagramManager.edgesAWS,
+                        diagramManager.subGraphs
+                    )
+                    break
+            }
+
+            diagramManager.needRerender = false
+        }, 500)
+
+        diagramManager.onDone(() => {
+            setIsGenerating(false)
+        })
 
         return () => {
-            setDiagram(
-                diagramManager.nodes,
-                diagramManager.edges,
-                diagramManager.subGraphs
-            ); // Pass subGraphs
+            // setDiagram(
+            //     diagramManager.nodes,
+            //     diagramManager.edges,
+            //     diagramManager.subGraphs
+            // ) // Pass subGraphs
 
             if (diagramManager.interval) {
-                clearInterval(diagramManager.interval);
+                clearInterval(diagramManager.interval)
             }
-        };
-    }, [diagramManager]);
+        }
+    }, [diagramManager, graphType])
 
-    const clipboard = useClipboard({ timeout: 500 });
+    const clipboard = useClipboard({ timeout: 500 })
 
     const handleCopyNameplate = () => {
         if (!nameplate) {
-            toast.error("Nameplate is empty");
-            return;
+            toast.error("Nameplate is empty")
+            return
         }
-        clipboard.copy(nameplate);
+        clipboard.copy(nameplate)
         if (clipboard.error) {
-            toast.error("Failed to copy nameplate");
-            return;
+            toast.error("Failed to copy nameplate")
+            return
         }
 
-        toast.success("Copied");
-    };
+        toast.success("Copied")
+    }
 
-    const [appShellShowed, { toggle: toggleAppShell }] = useAppShell();
-    const { toggle: toggleFullScreen } = useFullscreen();
+    const [appShellShowed, { toggle: toggleAppShell }] = useAppShell()
+    const { toggle: toggleFullScreen } = useFullscreen()
 
     const handleToggleAppShell = () => {
-        toggleAppShell();
-        toggleFullScreen();
-    };
+        toggleAppShell()
+        toggleFullScreen()
+    }
 
     return (
         <ReactFlow
@@ -296,6 +382,15 @@ const DiagramPage = () => {
                     </span>
                 </Button>
             </Panel>
+            <Panel position="top-right" style={{ right: 10 }}>
+                <SegmentedControl
+                    data={graphTypesData}
+                    size="xs"
+                    value={graphType}
+                    onChange={handleChangeGraphType}
+                    disabled={isGenerating}
+                />
+            </Panel>
             <Panel position="bottom-right">
                 <ActionIcon radius={"xl"} onClick={handleToggleAppShell}>
                     {appShellShowed ? (
@@ -306,7 +401,7 @@ const DiagramPage = () => {
                 </ActionIcon>
             </Panel>
         </ReactFlow>
-    );
-};
+    )
+}
 
-export default DiagramPage;
+export default DiagramPage

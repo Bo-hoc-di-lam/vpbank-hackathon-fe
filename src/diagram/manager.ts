@@ -9,6 +9,8 @@ import { convertIconName } from "@/utils/aws-icon"
 export class DiagramManager {
     public nodes: Node<any>[] = []
     public edges: Edge<any>[] = []
+    public nodesAWS: Node<any>[] = []
+    public edgesAWS: Edge<any>[] = []
     public subGraphs: Node<any>[] = [] // Add this line
     public selectedNodes: Node<any>[] = []
     public isGenerating: boolean = false
@@ -34,10 +36,10 @@ export class DiagramManager {
     public interval: NodeJS.Timeout | null = null
     private started: boolean = false
 
-    private handleAWSChatCallback: () => void;
+    private handleAWSChatCallback: () => void
 
     public setHandleAWSChatCallback(callback: () => void) {
-        this.handleAWSChatCallback = callback;
+        this.handleAWSChatCallback = callback
     }
 
     private ws: WSClient
@@ -47,7 +49,7 @@ export class DiagramManager {
 
         this.ws.on(WSEvent.Error, (error: string) => {
             if (this.onErrorHandler) {
-                this.onErrorHandler.forEach(handler => {
+                this.onErrorHandler.forEach((handler) => {
                     handler(error)
                 })
             }
@@ -56,7 +58,7 @@ export class DiagramManager {
         this.ws.on(WSEvent.SetDrawIO, (data: string) => {
             this.drawIO += data
             if (this.onDrawIOHandlers) {
-                this.onDrawIOHandlers.forEach(handler => {
+                this.onDrawIOHandlers.forEach((handler) => {
                     handler(this.drawIO)
                 })
             }
@@ -65,7 +67,7 @@ export class DiagramManager {
         this.ws.on(WSEvent.SetTerraformAWS, (data: string) => {
             this.terraform += data
             if (this.onTerraformHandlers) {
-                this.onTerraformHandlers.forEach(handler => {
+                this.onTerraformHandlers.forEach((handler) => {
                     handler(this.terraform)
                 })
             }
@@ -74,7 +76,7 @@ export class DiagramManager {
         this.ws.on(WSEvent.UserJoined, (uid: string) => {
             this.userCounter++
             if (this.onUserCounterChangeHandlers) {
-                this.onUserCounterChangeHandlers.forEach(handler => {
+                this.onUserCounterChangeHandlers.forEach((handler) => {
                     handler(this.userCounter)
                 })
             }
@@ -83,7 +85,7 @@ export class DiagramManager {
         this.ws.on(WSEvent.UserLeave, (uid: string) => {
             this.userCounter--
             if (this.onUserCounterChangeHandlers) {
-                this.onUserCounterChangeHandlers.forEach(handler => {
+                this.onUserCounterChangeHandlers.forEach((handler) => {
                     handler(this.userCounter)
                 })
             }
@@ -93,16 +95,15 @@ export class DiagramManager {
             this.userCounter = 0
             this.nameplate = data
             if (this.onRoomInfoHandlers) {
-                this.onRoomInfoHandlers.forEach(handler => {
+                this.onRoomInfoHandlers.forEach((handler) => {
                     handler(data)
                 })
             }
             if (this.onUserCounterChangeHandlers) {
-                this.onUserCounterChangeHandlers.forEach(handler => {
+                this.onUserCounterChangeHandlers.forEach((handler) => {
                     handler(this.userCounter)
                 })
             }
-
         })
 
         this.ws.on(WSEvent.AddNode, (data: any) => {
@@ -115,8 +116,8 @@ export class DiagramManager {
                 },
                 position: data.position,
                 // parentNode: data.sub_graph,
-            });
-        });
+            })
+        })
 
         this.ws.on(WSEvent.AddLink, (data: any) => {
             this.needRerender = true
@@ -126,42 +127,42 @@ export class DiagramManager {
                 target: data.to_id,
                 label: data.text,
                 markerEnd: {
-                    type: MarkerType.ArrowClosed
+                    type: MarkerType.ArrowClosed,
                 },
                 data: {
                     label: data.text,
-                }
-            });
-        });
+                },
+            })
+        })
 
         this.ws.on(WSEvent.AddNodeAWS, (data: any) => {
             this.needRerender = true
-            this.nodes.push({
+            this.nodesAWS.push({
                 id: data.id,
                 type: "common-aws",
                 data: {
                     label: data.text,
-                    icon: convertIconName(data.icon)
+                    icon: convertIconName(data.icon),
                 },
                 position: data.position,
                 // parentNode: data.sub_graph,
-            });
-        });
+            })
+        })
 
         this.ws.on(WSEvent.AddLinkAWS, (data: any) => {
             this.needRerender = true
-            this.edges.push({
+            this.edgesAWS.push({
                 id: data.id,
                 source: data.from_id,
                 target: data.to_id,
                 markerEnd: {
-                    type: MarkerType.ArrowClosed
+                    type: MarkerType.ArrowClosed,
                 },
                 data: {
                     label: data.text,
-                }
-            });
-        });
+                },
+            })
+        })
 
         // this.ws.on(WSEvent.SetNodePosition, (data: any) => {
         // 	this.needRerender = true;
@@ -180,26 +181,25 @@ export class DiagramManager {
             this.comment += data
 
             if (this.onCommentChangeHandlers) {
-                this.onCommentChangeHandlers.forEach(handler => {
+                this.onCommentChangeHandlers.forEach((handler) => {
                     handler(this.comment)
                 })
             }
-        });
+        })
 
         this.ws.on(WSEvent.SetCommentAWS, (data: any) => {
-            this.comment += data;
+            this.comment += data
 
             if (this.handleAWSChatCallback) {
-                this.handleAWSChatCallback();
+                this.handleAWSChatCallback()
             }
 
             if (this.onCommentChangeHandlers) {
-                this.onCommentChangeHandlers.forEach(handler => {
+                this.onCommentChangeHandlers.forEach((handler) => {
                     handler(this.comment)
                 })
             }
-        });
-
+        })
 
         // this.ws.on(WSEvent.AddSubGraph, (data: any) => {
         //     this.needRerender = true;
@@ -227,22 +227,21 @@ export class DiagramManager {
             }
 
             if (this.onDoneHandlers) {
-                this.onDoneHandlers.forEach(handler => {
-                    handler(data)
-                })
-            }
-        });
-
-        this.ws.on(WSEvent.Mermaid, (data: any) => {
-            this.mermaid = data
-
-            if (this.onMermaidHandlers) {
-                this.onMermaidHandlers.forEach(handler => {
+                this.onDoneHandlers.forEach((handler) => {
                     handler(data)
                 })
             }
         })
 
+        this.ws.on(WSEvent.Mermaid, (data: any) => {
+            this.mermaid = data
+
+            if (this.onMermaidHandlers) {
+                this.onMermaidHandlers.forEach((handler) => {
+                    handler(data)
+                })
+            }
+        })
 
         this.ws.on(WSEvent.ResetAWS, () => {
             this.clearData()
@@ -258,7 +257,13 @@ export class DiagramManager {
         // set interval fror renderFunc to update diagram
         this.resetInterval()
         if (this.started) {
-            this.ws.sendEditPrompt(query, this.selectedVertex().map(e => ({ id: e.id, text: e.data.label })))
+            this.ws.sendEditPrompt(
+                query,
+                this.selectedVertex().map((e) => ({
+                    id: e.id,
+                    text: e.data.label,
+                }))
+            )
         } else {
             this.ws.sendPrompt(query)
         }
@@ -287,12 +292,11 @@ export class DiagramManager {
     public edit(query: string) {
         this.isGenerating = true
         this.resetInterval()
-        const vertex: Vertex[] = this.selectedVertex().
-            map(node => ({
-                position: { x: 0, y: 0 },
-                id: node.id,
-                text: node.data.label
-            }))
+        const vertex: Vertex[] = this.selectedVertex().map((node) => ({
+            position: { x: 0, y: 0 },
+            id: node.id,
+            text: node.data.label,
+        }))
         this.ws.sendEditPrompt(query, vertex)
     }
 
@@ -330,7 +334,6 @@ export class DiagramManager {
         }
     }
 
-
     public setInterval(renderFunc: () => void, intervalTime: number) {
         this.renderFunc = renderFunc
         this.intervalTime = intervalTime
@@ -340,12 +343,11 @@ export class DiagramManager {
         this.selectedNodes = nodes
     }
 
-
     // private methods
     private clearData() {
-        this.nodes.length = 0
-        this.edges.length = 0
-        this.subGraphs.length = 0
+        // this.nodes.length = 0
+        // this.edges.length = 0
+        // this.subGraphs.length = 0
         this.comment = ""
     }
 
@@ -354,7 +356,7 @@ export class DiagramManager {
             switch (node.type) {
                 default:
                     return [...acc, node]
-                case 'group':
+                case "group":
                     return [...acc, ...this.nodeInGroup(node.id)]
             }
         }, [])
@@ -371,9 +373,11 @@ export class DiagramManager {
     }
 
     private nodeInGroup(group: string) {
-        let nodes = this.nodes.filter(node => node.parentNode === group)
+        let nodes = this.nodes.filter((node) => node.parentNode === group)
         // nested child group
-        let subGroups = this.subGraphs.filter(node => node.parentNode === group)
+        let subGroups = this.subGraphs.filter(
+            (node) => node.parentNode === group
+        )
         let childNodes = subGroups.reduce((acc, node) => {
             let childNodes = this.nodeInGroup(node.id)
             return [...acc, ...childNodes]

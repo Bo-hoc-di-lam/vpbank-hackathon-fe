@@ -1,10 +1,10 @@
 import {
     useCheckNodeSelected,
     useSelectedNodeStore,
-} from "@/store/selected-node-store";
-import { cn } from "@/utils/cn";
-import { ActionIcon, Group, Stack, Tooltip } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+} from "@/store/selected-node-store"
+import { cn } from "@/utils/cn"
+import { ActionIcon, Group, Stack, Tooltip } from "@mantine/core"
+import { useDisclosure } from "@mantine/hooks"
 import {
     IconCheck,
     IconEdit,
@@ -12,26 +12,26 @@ import {
     IconPin,
     IconTrash,
     IconX,
-} from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+} from "@tabler/icons-react"
+import { useEffect, useState } from "react"
 import {
     Handle,
     NodeToolbar,
     Position,
     useNodeId,
     useReactFlow,
-} from "reactflow";
-import { checkIconExist } from "@/utils/aws-icon";
+} from "reactflow"
+import { checkIconExist } from "@/utils/aws-icon"
 
 export interface BaseNodeData {
-    label?: string;
-    icon?: string;
+    label?: string
+    icon?: string
 }
 
 interface BaseNodeProps extends BaseNodeData {
-    selected: boolean;
-    className?: string;
-    labelClassName?: string;
+    selected: boolean
+    className?: string
+    labelClassName?: string
 }
 
 const BaseNode = ({
@@ -42,37 +42,37 @@ const BaseNode = ({
     labelClassName = "",
 }: BaseNodeProps) => {
     const [editMode, { open: openEditMode, close: closeEditMode }] =
-        useDisclosure(false);
+        useDisclosure(false)
 
-    const { getNode, setNodes, getNodes } = useReactFlow();
-    const [iconExist, setIconExist] = useState(false);
-    const nodeId = useNodeId();
-    const isNodeSelected = useCheckNodeSelected(nodeId!);
+    const { getNode, setNodes, getNodes } = useReactFlow()
+    const [iconExist, setIconExist] = useState(false)
+    const nodeId = useNodeId()
+    const isNodeSelected = useCheckNodeSelected(nodeId!)
 
     const toggleSelectedNode = useSelectedNodeStore(
         (state) => state.toggleSelectedNode
-    );
+    )
 
     const handleClick = () => {
-        toggleSelectedNode(nodeId!);
-    };
+        toggleSelectedNode(nodeId!)
+    }
 
-    const [labelEdit, setLabelEdit] = useState(label);
-    const [isSaved, setIsSaved] = useState(false);
+    const [labelEdit, setLabelEdit] = useState(label)
+    const [isSaved, setIsSaved] = useState(false)
     const handleEditSave = () => {
-        setIsSaved(true);
-        closeEditMode();
-    };
+        setIsSaved(true)
+        closeEditMode()
+    }
 
     const handleEditCancel = () => {
-        setLabelEdit(label);
-        closeEditMode();
-    };
+        setLabelEdit(label)
+        closeEditMode()
+    }
 
     useEffect(() => {
         if (isSaved) {
-            const nodes = getNodes();
-            const node = getNode(nodeId!);
+            const nodes = getNodes()
+            const node = getNode(nodeId!)
             if (node) {
                 setNodes(
                     nodes.map((n) => {
@@ -83,29 +83,29 @@ const BaseNode = ({
                                     ...n.data,
                                     label: labelEdit,
                                 },
-                            };
+                            }
                         }
-                        return n;
+                        return n
                     })
-                );
+                )
             }
-            setIsSaved(false);
+            setIsSaved(false)
         }
-    }, [isSaved, labelEdit, nodeId, getNode, getNodes, setNodes]);
+    }, [isSaved, labelEdit, nodeId, getNode, getNodes, setNodes])
 
     useEffect(() => {
         if (!selected) {
-            handleEditCancel();
+            handleEditCancel()
         }
-    }, [selected]);
+    }, [selected])
 
     useEffect(() => {
         if (icon) {
             checkIconExist(icon).then((exist) => {
-                setIconExist(exist);
-            });
+                setIconExist(exist)
+            })
         }
-    }, [icon]);
+    }, [icon])
 
     return (
         <>
@@ -142,7 +142,7 @@ const BaseNode = ({
                                 <IconEdit />
                             </ActionIcon>
                         </Tooltip>
-                        <Tooltip
+                        {/* <Tooltip
                             label={
                                 isNodeSelected ? "Discard" : "Keep this node"
                             }
@@ -154,7 +154,7 @@ const BaseNode = ({
                             >
                                 {isNodeSelected ? <IconMinus /> : <IconPin />}
                             </ActionIcon>
-                        </Tooltip>
+                        </Tooltip> */}
                         <Tooltip label="Delete">
                             <ActionIcon
                                 variant="light"
@@ -162,7 +162,7 @@ const BaseNode = ({
                                 onClick={() => {
                                     setNodes((nodes) =>
                                         nodes.filter((n) => n.id !== nodeId)
-                                    );
+                                    )
                                 }}
                             >
                                 <IconTrash />
@@ -178,10 +178,12 @@ const BaseNode = ({
                     w-auto h-auto p-1
                     transition-all duration-150 shadow-md
                     bg-white flex items-center justify-center border border-slate-500
-                    ${(selected || isNodeSelected) && "border-green-600 scale-110 border-2"}
+                    ${
+                        (selected || isNodeSelected) &&
+                        "border-green-600 scale-110 border-2"
+                    }
                       `,
                     className
-
                 )}
             >
                 <div className="flex items-center w-full h-full gap-1">
@@ -216,7 +218,7 @@ const BaseNode = ({
                 <Handle type="target" position={Position.Top} />
             </div>
         </>
-    );
-};
+    )
+}
 
-export default BaseNode;
+export default BaseNode
