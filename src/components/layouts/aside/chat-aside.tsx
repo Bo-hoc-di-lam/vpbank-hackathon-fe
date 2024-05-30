@@ -24,6 +24,7 @@ const ChatAside = () => {
     ])
     const [chat, setChat] = useState<string>("")
     const [messaging, setMessaging] = useState<boolean>(false)
+    const [loadingId, setLoadingId] = useState<string>("")
 
     const chatSectionViewport = useRef<HTMLDivElement>(null)
     const reactFlow = useReactFlow()
@@ -46,7 +47,7 @@ const ChatAside = () => {
         }
 
         // show toast loading
-        toast.loading("Generating diagram...")
+        setLoadingId(toast.loading("Generating diagram..."))
 
         diagramManager.start(chat)
         setChat("")
@@ -96,7 +97,7 @@ const ChatAside = () => {
 
         diagramManager.onDone(() => {
             // hide toast loading
-            toast.dismiss()
+            toast.dismiss(loadingId)
             setMessaging(false)
             // setConversation((prevConversation) => [
             //     ...prevConversation,
@@ -105,6 +106,12 @@ const ChatAside = () => {
             scrollBottom()
             reactFlow.fitView()
             toast.success("Done!")
+        })
+
+        diagramManager.onError((error) => {
+            toast.dismiss()
+            setLoadingId(null)
+            toast.error(error)
         })
     }, [])
 

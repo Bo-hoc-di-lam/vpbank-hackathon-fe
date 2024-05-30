@@ -6,7 +6,6 @@ import { WSClient } from "@/ws/client"
 import { title } from "process"
 import { Node, Edge } from "reactflow"
 import { convertIconName } from "@/utils/aws-icon"
-
 export class DiagramManager {
     public nodes: Node<any>[] = []
     public edges: Edge<any>[] = []
@@ -29,6 +28,7 @@ export class DiagramManager {
     private onMermaidHandlers: ((mermaid: string) => void)[] = []
     private onTerraformHandlers: ((terraform: string) => void)[] = []
     private onDrawIOHandlers: ((drawIO: string) => void)[] = []
+    private onErrorHandler: ((error: string) => void)[] = []
     private renderFunc: () => void
     private intervalTime: number = 0.5 * 1000
     public interval: NodeJS.Timeout | null = null
@@ -44,6 +44,14 @@ export class DiagramManager {
 
     constructor() {
         this.ws = new WSClient()
+
+        this.ws.on(WSEvent.Error, (error: string) => {
+            if (this.onErrorHandler) {
+                this.onErrorHandler.forEach(handler => {
+                    handler(error)
+                })
+            }
+        })
 
         this.ws.on(WSEvent.SetDrawIO, (data: string) => {
             this.drawIO += data
@@ -64,7 +72,6 @@ export class DiagramManager {
         })
 
         this.ws.on(WSEvent.UserJoined, (uid: string) => {
-            console.info("user joined", uid)
             this.userCounter++
             if (this.onUserCounterChangeHandlers) {
                 this.onUserCounterChangeHandlers.forEach(handler => {
@@ -74,7 +81,6 @@ export class DiagramManager {
         })
 
         this.ws.on(WSEvent.UserLeave, (uid: string) => {
-            console.info("user leave", uid)
             this.userCounter--
             if (this.onUserCounterChangeHandlers) {
                 this.onUserCounterChangeHandlers.forEach(handler => {
@@ -84,12 +90,19 @@ export class DiagramManager {
         })
 
         this.ws.on(WSEvent.RoomInfo, (data: string) => {
+            this.userCounter = 0
             this.nameplate = data
             if (this.onRoomInfoHandlers) {
                 this.onRoomInfoHandlers.forEach(handler => {
                     handler(data)
                 })
             }
+            if (this.onUserCounterChangeHandlers) {
+                this.onUserCounterChangeHandlers.forEach(handler => {
+                    handler(this.userCounter)
+                })
+            }
+
         })
 
         this.ws.on(WSEvent.AddNode, (data: any) => {
@@ -275,6 +288,10 @@ export class DiagramManager {
                 text: node.data.label
             }))
         this.ws.sendEditPrompt(query, vertex)
+    }
+
+    public onError(handler: (error: string) => void) {
+        this.onErrorHandler.push(handler)
     }
 
     public onDrawIO(handler: (drawIO: string) => void) {
