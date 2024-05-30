@@ -9,7 +9,7 @@ import {
     Tooltip
 } from "@mantine/core"
 import { IconCode, IconDoor, IconEdit } from "@tabler/icons-react"
-import React, { useState } from "react"
+import React, { useMemo, useState } from "react"
 import { GenerateTools, ManualEdit, Room } from "./sidebar-items"
 
 interface SidebarItem {
