@@ -8,9 +8,10 @@ import {
     Title,
     Tooltip
 } from "@mantine/core"
-import { IconCode, IconDoor, IconEdit } from "@tabler/icons-react"
-import React, { useMemo, useState } from "react"
-import { GenerateTools, ManualEdit, Room } from "./sidebar-items"
+import { IconCode, IconDoor, IconEdit, IconFile } from "@tabler/icons-react"
+import React, { useEffect, useMemo, useState } from "react"
+import { GenerateTools, ManualEdit, Room, RAG } from "./sidebar-items"
+import { set } from "lodash"
 
 interface SidebarItem {
     icon: React.ReactNode
@@ -21,6 +22,11 @@ interface SidebarItem {
 const Sidebar = () => {
     const sidebarItems = useMemo<SidebarItem[]>(() => {
         return [
+            {
+                icon: <IconFile size={24} />,
+                label: "Prebuilt Design",
+                chilren: <RAG />,
+            },
             {
                 icon: <IconDoor size={24} />,
                 label: "Room",
@@ -35,7 +41,7 @@ const Sidebar = () => {
                 icon: <IconCode size={24} />,
                 label: "Generate Tools",
                 chilren: <GenerateTools />,
-            },
+            }
         ]
     }, [])
 
@@ -58,6 +64,11 @@ const Sidebar = () => {
         setActiveItem(item)
         openNav()
     }
+
+    useEffect(() => {
+        setActiveItem(sidebarItems[0])
+        openNav()
+    }, [])
 
     return (
         <>
