@@ -8,9 +8,9 @@ import {
     Title,
     Tooltip
 } from "@mantine/core"
-import { IconCode, IconDoor, IconEdit } from "@tabler/icons-react"
+import { IconCode, IconDoor, IconEdit, IconFile } from "@tabler/icons-react"
 import React, { useMemo, useState } from "react"
-import { GenerateTools, ManualEdit, Room } from "./sidebar-items"
+import { GenerateTools, ManualEdit, Room, RAG } from "./sidebar-items"
 
 interface SidebarItem {
     icon: React.ReactNode
@@ -35,6 +35,11 @@ const Sidebar = () => {
                 icon: <IconCode size={24} />,
                 label: "Generate Tools",
                 chilren: <GenerateTools />,
+            },
+            {
+                icon: <IconFile size={24} />,
+                label: "Prebuilt Design",
+                chilren: <RAG />,
             },
         ]
     }, [])
