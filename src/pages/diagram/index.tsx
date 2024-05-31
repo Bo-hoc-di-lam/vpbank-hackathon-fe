@@ -269,7 +269,16 @@ const DiagramPage = () => {
             toast.success(`Room name: ${nameplate}`)
             setNameplate(nameplate)
         })
-
+        diagramManager.on(WSEvent.Done, (data) => {
+            if (data.event === WSEvent.PromptEdit) {
+                setGraphType(GraphType.BASE)
+                handleChangeGraphType(GraphType.BASE)
+            }
+            if (data.event === WSEvent.GenerateIcon) {
+                setGraphType(GraphType.AWS)
+                handleChangeGraphType(GraphType.AWS)
+            }
+        })
         diagramManager.setInterval(async () => {
             if (!diagramManager.needRerender) {
                 return

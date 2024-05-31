@@ -1,17 +1,18 @@
+import { useDiagramManager } from "@/store/digaram-mananger-store"
 import {
     useCheckNodeSelected,
     useSelectedNodeStore,
 } from "@/store/selected-node-store"
+import { WSEvent } from "@/type/ws_data"
+import { convertIconName } from "@/utils/aws-icon"
 import { cn } from "@/utils/cn"
-import { ActionIcon, Group, Stack, Tooltip } from "@mantine/core"
+import { ActionIcon, Stack, Tooltip } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import {
     IconCheck,
     IconEdit,
-    IconMinus,
-    IconPin,
     IconTrash,
-    IconX,
+    IconX
 } from "@tabler/icons-react"
 import { useEffect, useState } from "react"
 import {
@@ -21,7 +22,6 @@ import {
     useNodeId,
     useReactFlow,
 } from "reactflow"
-import { checkIconExist } from "@/utils/aws-icon"
 
 export interface BaseNodeData {
     label?: string
@@ -41,6 +41,7 @@ const BaseNode = ({
     className = "",
     labelClassName = "",
 }: BaseNodeProps) => {
+    const diagramManager = useDiagramManager()
     const [editMode, { open: openEditMode, close: closeEditMode }] =
         useDisclosure(false)
 
@@ -48,6 +49,8 @@ const BaseNode = ({
     const [iconExist, setIconExist] = useState(false)
     const nodeId = useNodeId()
     const isNodeSelected = useCheckNodeSelected(nodeId!)
+    const [iconUrl, setIconUrl] = useState("")
+    const [genId, setGenId] = useState(0)
 
     const toggleSelectedNode = useSelectedNodeStore(
         (state) => state.toggleSelectedNode
@@ -68,6 +71,13 @@ const BaseNode = ({
         setLabelEdit(label)
         closeEditMode()
     }
+    useEffect(() => {
+        diagramManager.on(WSEvent.Done, (data) => {
+            if (data.event === WSEvent.GenerateIcon) {
+                setGenId(Math.random())
+            }
+        })
+    }, [])
 
     useEffect(() => {
         if (isSaved) {
@@ -101,11 +111,11 @@ const BaseNode = ({
 
     useEffect(() => {
         if (icon) {
-            checkIconExist(icon).then((exist) => {
-                setIconExist(exist)
-            })
+            const converted = convertIconName(icon)
+            setIconUrl(`https://app.eraser.io/static/canvas-icons/${converted}.svg`)
+            setIconExist(true)
         }
-    }, [icon])
+    }, [icon, genId])
 
     return (
         <>
@@ -178,9 +188,8 @@ const BaseNode = ({
                     w-auto h-auto p-1
                     transition-all duration-150 shadow-md
                     bg-white flex items-center justify-center border border-slate-500
-                    ${
-                        (selected || isNodeSelected) &&
-                        "border-green-600 scale-110 border-2"
+                    ${(selected || isNodeSelected) &&
+                    "border-green-600 scale-110 border-2"
                     }
                       `,
                     className
@@ -189,11 +198,17 @@ const BaseNode = ({
                 <div className="flex items-center w-full h-full gap-1">
                     {iconExist && (
                         <div className="flex-shrink-0">
-                            <img
-                                src={`https://app.eraser.io/static/canvas-icons/${icon}.svg`}
-                                alt={icon}
-                                className=" w-auto h-10 rounded-sm"
-                            />
+                            <Tooltip label={icon.toUpperCase()}>
+                                <img
+                                    src={iconUrl}
+                                    alt={icon}
+                                    className=" w-auto h-10 rounded-sm hover:animate-pulse"
+                                    onError={evt => {
+                                        console.log("img broken")
+                                        evt.currentTarget.style.display = 'none'
+                                    }}
+                                />
+                            </Tooltip>
                         </div>
                     )}
                     <div className="flex-grow text-center text-xs">
