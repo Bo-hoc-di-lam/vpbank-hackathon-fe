@@ -1,6 +1,5 @@
-import { Vertex } from "@/type/diagram";
+import { Link, Vertex } from "@/type/diagram";
 import { SystemType, WSEvent } from "@/type/ws_data";
-import { convertIconName } from "@/utils/aws-icon";
 import { WSClient, WSEventMap } from "@/ws/client";
 import { Edge, MarkerType, Node } from "reactflow";
 export class DiagramManager {
@@ -24,6 +23,8 @@ export class DiagramManager {
 
 
 
+
+    private mainChanged = false
     private onUserCounterChangeHandlers: ((count: number) => void)[] = []
     private renderFunc: () => void
     private intervalTime: number = 0.2 * 1000
@@ -93,6 +94,7 @@ export class DiagramManager {
         })
 
         this.ws.on(WSEvent.AddNode, (data: any) => {
+            if (data.id === "") return
             this.needRerender = true
             this.nodes.push({
                 id: data.id,
@@ -122,25 +124,27 @@ export class DiagramManager {
         })
 
         this.ws.on(WSEvent.AddNodeAWS, (data: any) => {
+            if (data.id === "") return
             this.needRerender = true
             this.nodesAWS.push({
                 id: data.id,
                 type: "common-aws",
                 data: {
                     label: data.text,
-                    icon: convertIconName(data.icon),
+                    icon: data.icon,
                 },
                 position: data.position,
                 // parentNode: data.sub_graph,
             })
         })
 
-        this.ws.on(WSEvent.AddLinkAWS, (data: any) => {
+        this.ws.on(WSEvent.AddLinkAWS, (data: Link) => {
             this.needRerender = true
             this.edgesAWS.push({
                 id: data.id,
                 source: data.from_id,
                 target: data.to_id,
+                label: data.text,
                 markerEnd: {
                     type: MarkerType.ArrowClosed,
                 },
@@ -217,7 +221,7 @@ export class DiagramManager {
         })
 
         this.ws.on(WSEvent.ResetAWS, () => {
-            this.clearData()
+            this.clearDataAWS()
         })
     }
 
@@ -300,10 +304,19 @@ export class DiagramManager {
 
     // private methods
     private clearData() {
-        // this.nodes.length = 0
-        // this.edges.length = 0
-        // this.subGraphs.length = 0
+        this.nodes.length = 0
+        this.edges.length = 0
+        this.subGraphs.length = 0
         this.comment = ""
+        this.mermaid = ""
+        this.clearDataAWS()
+    }
+
+    private clearDataAWS() {
+        this.nodesAWS.length = 0
+        this.edgesAWS.length = 0
+        this.comment = ""
+        this.mermaidAWS = ""
     }
 
     private selectedVertex(): Node<any>[] {

@@ -1,7 +1,6 @@
 import { MantineProvider } from "@mantine/core"
 import { ModalsProvider } from "@mantine/modals"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
 import { Toaster } from 'react-hot-toast'
 import { RouterProvider, createBrowserRouter } from "react-router-dom"
@@ -36,16 +35,14 @@ const router = createBrowserRouter([
 ])
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-    <StrictMode>
-        <QueryClientProvider client={queryClient}>
-            <MantineProvider>
-                <ModalsProvider>
-                    <ReactFlowProvider>
-                        <RouterProvider router={router} />
-                        <Toaster />
-                    </ReactFlowProvider>
-                </ModalsProvider>
-            </MantineProvider>
-        </QueryClientProvider>
-    </StrictMode>
+    <QueryClientProvider client={queryClient}>
+        <MantineProvider>
+            <ModalsProvider>
+                <ReactFlowProvider>
+                    <RouterProvider router={router} />
+                    <Toaster />
+                </ReactFlowProvider>
+            </ModalsProvider>
+        </MantineProvider>
+    </QueryClientProvider>
 )
