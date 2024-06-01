@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { FileInput, rem, Button, Textarea } from '@mantine/core';
+import { Button, FileInput, Textarea, rem } from '@mantine/core';
 import { IconFileCv } from '@tabler/icons-react';
-import toast from 'react-hot-toast';
 import axios from 'axios';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 const FILE_UPLOAD_URL = 'https://ai.bhdl.online/rag/upload/requirement';
-const TEXT_UPLOAD_URL = 'https://ai.bhdl.online/rag/upload/text';
+const TEXT_UPLOAD_URL = 'https://ai.bhdl.online/rag/text-upload/requirement';
 
 const RAG = () => {
 	const [file, setFile] = useState(null);
@@ -59,7 +59,7 @@ const RAG = () => {
 				leftSectionPointerEvents="none"
 				radius="md"
 				onChange={setFile}
-				accept=".docx,.pdf"
+				accept=".docx,.pdf,.txt"
 			/>
 			<Textarea
 				placeholder="Enter your text here"
