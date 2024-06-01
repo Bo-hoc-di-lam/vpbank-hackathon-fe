@@ -1,54 +1,47 @@
-![](https://github.com/xyflow/web/blob/main/assets/codesandbox-header-ts.png?raw=true)
+# bhdl.online frontend 
 
-# React Flow starter (Vite + TS)
+**bhdl.online** is an application designed to provide various functionalities to help users create and manage architecture design diagram more effectively. With the power of ChatGPT 4, out application can provide users ability to create architecture design from scratch with a more interactive and user-friendly experience. 
 
-We've put together this template to serve as a starting point for folks
-interested in React Flow. You can use this both as a base for your own React
-Flow applications, or for small experiments or bug reports.
+**Main features**
 
-**TypeScript not your thing?** We also have a vanilla JavaScript starter template,
-just for you!
+- Utilizes ChatGPT 4 to turn user's ideas into architecture design diagrams
+- Ability to create, edit, explain and manage architecture design diagrams
+- Export diagram to various diagram formats (Mermaid, DrawIO)
+- Generate code snippets from architecture design diagrams (Terraform, Ansible)
+- Ability to handle multiple user use same diagram at the same time
 
-## Getting up and running
+![Overview 1](./images/aws.png)
+![Overview 2](./images/terraform.png)
 
-You can get this template without forking/cloning the repo using `degit`:
+# bhdl.online frontend
 
-```bash
-npx degit xyflow/vite-react-flow-template your-app-name
-```
+This repository contains the frontend code for the bhdl.online application. This is one of the three components of the bhdl.online project. The other two components are:
+- [bhdl.online backend](https://github.com/bhdl-ai/vpbank-hackathon-be)
+- [bhdl.online ai core](https://github.com/bhdl-ai/vpbank-hackathon-ai)
 
-The template contains mostly the minimum dependencies to get up and running, but
-also includes eslint and some additional rules to help you write React code that
-is less likely to run into issues:
+## Build with
 
-```bash
-npm install # or `pnpm install` or `yarn install`
-```
+- [Vite](https://vitejs.dev): Frontend build tool
+- [React](https://react.dev): Frontend framework to build the user interface
+- [Reactflow](https://reactflow.dev): React library for building node-based graphs
+- [TailwindCSS](https://tailwindcss.com): Utility-first CSS framework
+- [Mantine](https://mantine.dev): React components and hooks library
+- [Zustand](https://zustand.surge.sh): State management library
 
-Vite is a great development server and build tool that we recommend our users to
-use. You can start a development server with:
+## Getting Started
 
-```bash
-npm run dev
-```
+1. Make sure you already have the [bhdl.online ai core](https://github.com/bhdl-ai/vpbank-hackathon-ai) abd [bhdl.online be](https://github.com/bhdl-ai/vpbank-hackathon-be) running
+2. Install the required dependencies using `npm i`
+3. Create your own `.env` file based on the `.env.example` file
+4. Run the frontend using `npm run dev` 
 
-While the development server is running, changes you make to the code will be
-automatically reflected in the browser!
+Now the frontend should be running on `http://localhost:5173/`
 
-## Things to try:
 
-- Create a new custom node inside `src/nodes/` (don't forget to export it from `src/nodes/index.ts`).
-- Change how things look by [overriding some of the built-in classes](https://reactflow.dev/learn/customization/theming#overriding-built-in-classes).
-- Add a layouting library to [position your nodes automatically](https://reactflow.dev/learn/layouting/layouting)
+## Owner
 
-## Resources
-
-Links:
-
-- [React Flow - Docs](https://reactflow.dev)
-- [React Flow - Discord](https://discord.com/invite/Bqt6xrs)
-
-Learn:
-
-- [React Flow – Custom Nodes](https://reactflow.dev/learn/customization/custom-nodes)
-- [React Flow – Layouting](https://reactflow.dev/learn/layouting/layouting)
+- [DAN3002](https://github.com/DAN3002)
+- [thaiminhpv](https://github.com/thaiminhpv)
+- [qwerty22121998](https://github.com/qwerty22121998)
+- [khuatdev](https://github.com/khuatdev)
+- [LiusDev](https://github.com/LiusDev)
