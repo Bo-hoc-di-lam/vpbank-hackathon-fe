@@ -1,7 +1,7 @@
-import { motion } from "framer-motion"
-import { AuroraBackground } from "../components/ui/aurora-background"
 import { Button } from "@/components/ui/moving-border"
+import { motion } from "framer-motion"
 import { Link } from "react-router-dom"
+import { AuroraBackground } from "../components/ui/aurora-background"
 export default function Home() {
     return (
         <AuroraBackground>
@@ -16,7 +16,8 @@ export default function Home() {
                 className="relative flex flex-col gap-4 items-center justify-center px-4"
             >
                 <div className="text-3xl md:text-7xl font-bold dark:text-white text-center">
-                    VPBank Hackathon
+                    <img src="/vpbank.svg" className="mb-5" />
+                    Hackathon
                 </div>
                 <div className="font-extralight text-base md:text-4xl dark:text-neutral-200 py-4">
                     Team 100 - BHDL

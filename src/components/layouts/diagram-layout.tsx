@@ -46,7 +46,7 @@ export function DiagramLayout({
                 <AppShell.Header>
                     <Group h="100%" px="md">
                         <Link to="/" className="flex gap-3 items-center">
-                            <Image src="/logo.svg" alt="BHDL Logo" h={40} />
+                            <Image src="/logo.png" alt="BHDL Logo" h={40} />
                             <Title order={5}>
                                 VPBank Hackathon | Team 100 | BHDL
                             </Title>
