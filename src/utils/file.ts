@@ -30,7 +30,7 @@ const exportToDrawIO = (codeString: string) => {
 	const url = URL.createObjectURL(blob);
 	const link = document.createElement('a');
 	link.href = url;
-	link.download = 'drawIO.yml';
+	link.download = 'drawIO.xml';
 	document.body.appendChild(link);
 	link.click();
 	document.body.removeChild(link);
@@ -38,7 +38,7 @@ const exportToDrawIO = (codeString: string) => {
 }
 
 export {
-	exportToMermaidFile,
-	exportToTerraform,
-	exportToDrawIO
-}
+	exportToDrawIO, exportToMermaidFile,
+	exportToTerraform
+};
+
