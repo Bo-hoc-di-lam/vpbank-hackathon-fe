@@ -22,7 +22,7 @@ This repository contains the frontend code for the bhdl.online application. This
 ## Build with
 
 - [Vite](https://vitejs.dev): Frontend build tool
-- [React](https://react.dev): Frontend framework to build the user interface
+- [React](https://react.dev): Frontend library to build the user interface
 - [Reactflow](https://reactflow.dev): React library for building node-based graphs
 - [TailwindCSS](https://tailwindcss.com): Utility-first CSS framework
 - [Mantine](https://mantine.dev): React components and hooks library
